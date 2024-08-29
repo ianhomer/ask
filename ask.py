@@ -40,8 +40,13 @@ def main():
     model = genai.GenerativeModel("gemini-1.5-flash")
     chat = model.start_chat(
         history=[
-            {"role": "user", "parts": " AND ".join(inputs)},
+            {"role": "user", "parts": " ".join(inputs)},
             {"role": "model", "parts": "Thanks, what would like?"},
+            {
+                "role": "user",
+                "parts": "Unless I say otherwise keep responses below 15 lines",
+            },
+            {"role": "model", "parts": "I understand"},
         ]
     )
     while True:
@@ -54,6 +59,7 @@ def main():
             or (args.inputs and "answer what I just asked")
             or "you start"
         )
+        assert user_input
         response = chat.send_message(user_input)
         print(response.text)
 
