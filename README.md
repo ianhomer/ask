@@ -29,7 +29,10 @@ Start off a chat on a given theme and then quick fire requests
 
 ```sh
 ❯ ask show me terraform for the following
+```
+
 (-_-) s3
+
 ```terraform
 resource "aws_s3_bucket" "example" {
   bucket = "my-bucket-name"
@@ -43,6 +46,7 @@ resource "aws_s3_bucket" "example" {
 ```
 
 (-_-) vpc
+
 ```terraform
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
@@ -57,7 +61,9 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 }
 ```
+
 (-_-) rds
+
 ```terraform
 resource "aws_db_instance" "default" {
   allocated_storage = 10
@@ -74,6 +80,4 @@ resource "aws_db_subnet_group" "default" {
   name       = "default"
   subnet_ids = [aws_subnet.public.id]
 }
-```
-(-_-)
 ```
