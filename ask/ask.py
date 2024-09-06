@@ -5,10 +5,10 @@ import os
 from pathlib import Path
 from pypdf import PdfReader
 import argparse
-from typing import Optional
+from typing import Optional, List, Tuple
 
 
-def signal_handler(sig, frame):
+def signal_handler(sig: int, frame: Optional[object]) -> None:
     print("\nBye ...")
     sys.exit(0)
 
@@ -31,7 +31,7 @@ ASK_PROMPT_DIRECTORY_NAME = "ASK_PROMPT_DIRECTORY"
 file_input = False
 
 
-def get_prompt(inputs, template: Optional[str]):
+def get_prompt(inputs: List[str], template: Optional[str]) -> Tuple[str, bool]:
     parts = []
     file_input = False
     for word in inputs:
@@ -73,7 +73,7 @@ if args.dry:
     sys.exit(0)
 
 
-def main():
+def main() -> None:
     if API_KEY_NAME not in os.environ:
         raise Exception(f"Please set {API_KEY_NAME}")
     api_key = os.environ[API_KEY_NAME]
