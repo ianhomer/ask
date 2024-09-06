@@ -2,11 +2,11 @@
 
 This is basic terminal chat bot. Uses Gemini API. Get an API and set
 
-    export GEMINI_API_KEY=my-super-secret-key 
+    export GEMINI_API_KEY=my-super-secret-key
 
 Install
 
-    pip install .
+    pip install -e .
 
 Start a chat
 
@@ -19,6 +19,25 @@ Or pass in a file to work on
 Or ask a question to work on
 
     ask what time is love
+
+Or use a prompt template
+
+    ask --template lexical.txt dog poodle fish
+
+Where prompt template has `{}` placeholders, e.g.
+
+    You are skilled lexical scanner. Can you tell me whether the phrase {} relates to phrase 1 or phrase 2 below
+    Phrase 1: {}
+    Phrase 2: {}
+
+Which may return content like
+
+    The phrase "dog" relates to **phrase 1: poodle**.
+    "Poodle" is a type of dog, making them both related.  "Fish" is a completely different animal category.
+
+You can set a prompt directory with the env variable name `ASK_PROMPT_DIRECTORY`, and place prompts in `.txt` files in that directory. Then refer to the template with the base name. For example the following would use `my-prompt` in the `ASK_PROMPT_DIRECTORY` directory.
+
+    ask --template my-prompt one two three
 
 Hit return to ask the default question, e.g. proof read or answer the question.
 Or elaborate and ask more.
