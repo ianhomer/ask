@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 from pypdf import PdfReader
 import argparse
+from typing import Optional
 
 
 def signal_handler(sig, frame):
@@ -30,7 +31,7 @@ ASK_PROMPT_DIRECTORY_NAME = "ASK_PROMPT_DIRECTORY"
 file_input = False
 
 
-def get_prompt(inputs, template):
+def get_prompt(inputs, template: Optional[str]):
     parts = []
     file_input = False
     for word in inputs:
@@ -46,16 +47,16 @@ def get_prompt(inputs, template):
         else:
             parts.append(word)
 
-    if args.template:
-        if "." in args.template:
-            prompt_file_name = args.template
+    if template:
+        if "." in template:
+            prompt_file_name = template
         else:
             if ASK_PROMPT_DIRECTORY_NAME not in os.environ:
                 raise Exception(
                     f"Please set {ASK_PROMPT_DIRECTORY_NAME} to use logical prompt names"
                 )
             prompt_directory = os.environ[ASK_PROMPT_DIRECTORY_NAME]
-            prompt_file_name = f"{prompt_directory}/{args.template}.txt"
+            prompt_file_name = f"{prompt_directory}/{template}.txt"
             if not os.path.exists(prompt_file_name):
                 raise Exception(f"Cannot find prompt file {prompt_file_name}")
         template = Path(prompt_file_name).read_text()
