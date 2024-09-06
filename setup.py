@@ -10,7 +10,7 @@ setup(
     py_modules=["ask"],
     entry_points={
         "console_scripts": [
-            "ask=ask:main",
+            "ask=ask.ask:main",
         ],
     },
     install_requires=required

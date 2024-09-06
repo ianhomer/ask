@@ -30,37 +30,41 @@ ASK_PROMPT_DIRECTORY_NAME = "ASK_PROMPT_DIRECTORY"
 file_input = False
 
 
-inputs = []
-for word in args.inputs:
-    if "." in word and os.path.exists(word):
-        if word.endswith(".pdf"):
-            reader = PdfReader(word)
-            text = "".join(page.extract_text() for page in reader.pages)
+def get_prompt(inputs, template):
+    parts = []
+    file_input = False
+    for word in inputs:
+        if "." in word and os.path.exists(word):
+            if word.endswith(".pdf"):
+                reader = PdfReader(word)
+                text = "".join(page.extract_text() for page in reader.pages)
+            else:
+                with open(word, "r") as file:
+                    text = file.read()
+            parts.append(text)
+            file_input = not template
         else:
-            with open(word, "r") as file:
-                text = file.read()
-        inputs.append(text)
-        file_input = not args.template
+            parts.append(word)
+
+    if args.template:
+        if "." in args.template:
+            prompt_file_name = args.template
+        else:
+            if ASK_PROMPT_DIRECTORY_NAME not in os.environ:
+                raise Exception(
+                    f"Please set {ASK_PROMPT_DIRECTORY_NAME} to use logical prompt names"
+                )
+            prompt_directory = os.environ[ASK_PROMPT_DIRECTORY_NAME]
+            prompt_file_name = f"{prompt_directory}/{args.template}.txt"
+            if not os.path.exists(prompt_file_name):
+                raise Exception(f"Cannot find prompt file {prompt_file_name}")
+        template = Path(prompt_file_name).read_text()
+        return (template.format(*parts), file_input)
     else:
-        inputs.append(word)
+        return (" ".join(parts), file_input)
 
 
-if args.template:
-    if "." in args.template:
-        prompt_file_name = args.template
-    else:
-        if ASK_PROMPT_DIRECTORY_NAME not in os.environ:
-            raise Exception(
-                f"Please set {ASK_PROMPT_DIRECTORY_NAME} to use logical prompt names"
-            )
-        prompt_directory = os.environ[ASK_PROMPT_DIRECTORY_NAME]
-        prompt_file_name = f"{prompt_directory}/{args.template}.txt"
-        if not os.path.exists(prompt_file_name):
-            raise Exception(f"Cannot find prompt file {prompt_file_name}")
-    template = Path(prompt_file_name).read_text()
-    prompt = template.format(*inputs)
-else:
-    prompt = " ".join(inputs)
+prompt, file_input = get_prompt(args.inputs, args.template)
 
 if args.dry:
     print("Prompt : ")
