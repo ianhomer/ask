@@ -1,1 +1,1 @@
-from .ask import get_prompt
+from .get_prompt import get_prompt

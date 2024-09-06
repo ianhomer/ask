@@ -1,11 +1,13 @@
 import signal
 import sys
 import google.generativeai as genai
+from google.generativeai.types import content_types
 import os
-from pathlib import Path
-from pypdf import PdfReader
 import argparse
-from typing import Optional, List, Tuple
+from typing import Optional
+from collections.abc import Iterable
+
+from ask.get_prompt import get_prompt
 
 
 def signal_handler(sig: int, frame: Optional[object]) -> None:
@@ -24,45 +26,11 @@ parser.add_argument(
 )
 parser.add_argument("--line-target", help="Line target for output")
 
+
 args = parser.parse_args()
 
 API_KEY_NAME = "GEMINI_API_KEY"
-ASK_PROMPT_DIRECTORY_NAME = "ASK_PROMPT_DIRECTORY"
 file_input = False
-
-
-def get_prompt(inputs: List[str], template: Optional[str]) -> Tuple[str, bool]:
-    parts = []
-    file_input = False
-    for word in inputs:
-        if "." in word and os.path.exists(word):
-            if word.endswith(".pdf"):
-                reader = PdfReader(word)
-                text = "".join(page.extract_text() for page in reader.pages)
-            else:
-                with open(word, "r") as file:
-                    text = file.read()
-            parts.append(text)
-            file_input = not template
-        else:
-            parts.append(word)
-
-    if template:
-        if "." in template:
-            prompt_file_name = template
-        else:
-            if ASK_PROMPT_DIRECTORY_NAME not in os.environ:
-                raise Exception(
-                    f"Please set {ASK_PROMPT_DIRECTORY_NAME} to use logical prompt names"
-                )
-            prompt_directory = os.environ[ASK_PROMPT_DIRECTORY_NAME]
-            prompt_file_name = f"{prompt_directory}/{template}.txt"
-            if not os.path.exists(prompt_file_name):
-                raise Exception(f"Cannot find prompt file {prompt_file_name}")
-        template = Path(prompt_file_name).read_text()
-        return (template.format(*parts), file_input)
-    else:
-        return (" ".join(parts), file_input)
 
 
 prompt, file_input = get_prompt(args.inputs, args.template)
@@ -80,15 +48,15 @@ def main() -> None:
 
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-1.5-flash")
-    history = [
-        {"role": "user", "parts": prompt},
-        {"role": "model", "parts": "Thanks, what would like?"},
+    history: Iterable[content_types.StrictContentType] = [
+        {"role": "user", "parts": [prompt]},
+        {"role": "model", "parts": ["Thanks, what would like?"]},
     ]
     if args.line_target:
         history += [
             {
                 "role": "user",
-                "parts": f"Unless I say otherwise keep responses below {args.line_target} lines",
+                "parts": [f"Unless I say otherwise keep responses below {args.line_target} lines"],
             },
             {"role": "model", "parts": "I understand"},
         ]
