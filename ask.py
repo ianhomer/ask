@@ -3,6 +3,7 @@ import sys
 import google.generativeai as genai
 import os
 from pathlib import Path
+from pypdf import PdfReader
 import argparse
 
 
@@ -20,6 +21,7 @@ parser.add_argument("--template", help="Input template")
 parser.add_argument(
     "--dry", help="Just output the prompt and then exit", action="store_true"
 )
+parser.add_argument("--line-target", help="Line target for output")
 
 args = parser.parse_args()
 
@@ -31,11 +33,16 @@ file_input = False
 inputs = []
 for word in args.inputs:
     if "." in word and os.path.exists(word):
-        with open(word, "r") as file:
-            inputs.append(file.read())
-            file_input = True
-            pass
-    inputs.append(word)
+        if word.endswith(".pdf"):
+            reader = PdfReader(word)
+            text = "".join(page.extract_text() for page in reader.pages)
+        else:
+            with open(word, "r") as file:
+                text = file.read()
+        inputs.append(text)
+        file_input = not args.template
+    else:
+        inputs.append(word)
 
 
 if args.template:
@@ -68,17 +75,19 @@ def main():
 
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-1.5-flash")
-    chat = model.start_chat(
-        history=[
-            {"role": "user", "parts": prompt},
-            {"role": "model", "parts": "Thanks, what would like?"},
+    history = [
+        {"role": "user", "parts": prompt},
+        {"role": "model", "parts": "Thanks, what would like?"},
+    ]
+    if args.line_target:
+        history += [
             {
                 "role": "user",
-                "parts": "Unless I say otherwise keep responses below 15 lines",
+                "parts": f"Unless I say otherwise keep responses below {args.line_target} lines",
             },
             {"role": "model", "parts": "I understand"},
         ]
-    )
+    chat = model.start_chat(history=history)
     while True:
         user_input = (
             input("(-_-) ")
