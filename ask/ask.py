@@ -7,7 +7,7 @@ import argparse
 from typing import Optional
 from collections.abc import Iterable
 
-from get_prompt import get_prompt
+from .prompt import get_prompt
 
 
 def signal_handler(sig: int, frame: Optional[object]) -> None:

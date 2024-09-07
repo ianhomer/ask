@@ -1,1 +1,1 @@
-from .get_prompt import get_prompt
+from .prompt import get_prompt

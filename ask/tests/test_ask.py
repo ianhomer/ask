@@ -1,4 +1,4 @@
-from ..get_prompt import get_prompt
+from ..prompt import get_prompt
 import os
 
 TESTS_DIRECTORY = os.path.dirname(__file__)
