@@ -1,18 +1,39 @@
-# An AI chat bot
+# An AI command line chat bot
 
-This is basic terminal chat bot. Uses Gemini API. Get an API and set
+An AI chat bot you can run from the command line. It provides a proxy onto the
+underlying [Google Gemini APIs](https://ai.google.dev/#gemini-api). When you
+start the chat bot you provide a context, either an opening question, file
+inputs or a prompt template. From that point you can ask further questions
+from that context.
+
+## Installation
+
+You can either run direct from source
+
+    pip3 install -r requirements.txt
+    python ask/ask.py hello
+
+Or install globally
+
+    pip install .
+    ask hello
+
+Or install globally in editable mode, for example if you want to make modifications to the code
+
+    pip install -e .
+    ask hello
+
+## Getting started
+
+You'll need a Gemini API Key to get started.  You can get one from the [Google AI Studio](https://aistudio.google.com/). Set the key as an environment variable.
 
     export GEMINI_API_KEY=my-super-secret-key
 
-Install
-
-    pip install -e .
-
-Start a chat
+Then start a chat
 
     ask
 
-Or pass in a file to work on
+You can pass the contents of a file in as an input
 
     ask file.txt
 
@@ -31,7 +52,7 @@ Start off a chat on a given theme and then quick fire requests
 ❯ ask show me terraform for the following
 ```
 
-(-_-) s3
+(-\_-) s3
 
 ```terraform
 resource "aws_s3_bucket" "example" {
@@ -45,7 +66,7 @@ resource "aws_s3_bucket" "example" {
 }
 ```
 
-(-_-) vpc
+(-\_-) vpc
 
 ```terraform
 resource "aws_vpc" "main" {
@@ -62,7 +83,7 @@ resource "aws_subnet" "public" {
 }
 ```
 
-(-_-) rds
+(-\_-) rds
 
 ```terraform
 resource "aws_db_instance" "default" {
@@ -108,5 +129,3 @@ template with the base name. For example the following would use `my-prompt` in
 the `ASK_PROMPT_DIRECTORY` directory.
 
     ask --template my-prompt one two three
-
-

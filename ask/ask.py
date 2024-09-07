@@ -7,7 +7,7 @@ import argparse
 from typing import Optional
 from collections.abc import Iterable
 
-from ask.get_prompt import get_prompt
+from get_prompt import get_prompt
 
 
 def signal_handler(sig: int, frame: Optional[object]) -> None:
@@ -43,7 +43,15 @@ if args.dry:
 
 def main() -> None:
     if API_KEY_NAME not in os.environ:
-        raise Exception(f"Please set {API_KEY_NAME}")
+        print(
+            f"""
+
+  Please get a Gemini API key from https://aistudio.google.com/
+  and set in the environment variable {API_KEY_NAME}
+
+              """
+        )
+        sys.exit(1)
     api_key = os.environ[API_KEY_NAME]
 
     genai.configure(api_key=api_key)
@@ -56,7 +64,9 @@ def main() -> None:
         history += [
             {
                 "role": "user",
-                "parts": [f"Unless I say otherwise keep responses below {args.line_target} lines"],
+                "parts": [
+                    f"Unless I say otherwise keep responses below {args.line_target} lines"
+                ],
             },
             {"role": "model", "parts": "I understand"},
         ]
