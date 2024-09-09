@@ -8,6 +8,7 @@ from typing import Optional
 from collections.abc import Iterable
 
 from .prompt import get_prompt
+from .save import save
 
 
 def signal_handler(sig: int, frame: Optional[object]) -> None:
@@ -31,7 +32,6 @@ args = parser.parse_args()
 
 API_KEY_NAME = "GEMINI_API_KEY"
 file_input = False
-
 
 prompt, file_input = get_prompt(args.inputs, args.template)
 
@@ -71,6 +71,7 @@ def main() -> None:
             {"role": "model", "parts": "I understand"},
         ]
     chat = model.start_chat(history=history)
+    response_text = ""
     while True:
         user_input = (
             input("(-_-) ")
@@ -81,9 +82,15 @@ def main() -> None:
             or (args.inputs and "answer what I just asked")
             or "you start"
         )
+        if user_input.lower() == "save":
+            save(response_text)
+            continue
+        if user_input.lower().endswith("ignore"):
+            continue
         assert user_input
         response = chat.send_message(user_input)
-        print(response.text)
+        response_text = response.text
+        print(response_text)
 
 
 if __name__ == "__main__":
