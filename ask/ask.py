@@ -42,6 +42,16 @@ if args.dry:
     sys.exit(0)
 
 
+def process_user_input(chat, user_input: str) -> None:
+    try:
+        response = chat.send_message(user_input)
+        response_text = response.text
+        print("\n   -) ...                                     ...\n")
+        print(response_text)
+    except Exception as e:
+        print(f"\nCannot process prompt \n{user_input}\n", e)
+
+
 def main() -> None:
     if API_KEY_NAME not in os.environ:
         print(
@@ -72,6 +82,7 @@ def main() -> None:
             {"role": "model", "parts": "I understand"},
         ]
     chat = model.start_chat(history=history)
+
     response_text = ""
     while True:
         user_input = (
@@ -84,19 +95,16 @@ def main() -> None:
             or "you start"
         ).strip()
         user_input += get_more_input_with_wait()
+
         if user_input.lower() == "save":
             save(response_text)
             continue
+
         if user_input.lower().endswith("ignore"):
             continue
+
         if len(user_input) > 0:
-            try:
-                response = chat.send_message(user_input)
-                response_text = response.text
-                print("\n   -) ...                                     ...\n")
-                print(response_text)
-            except Exception as e:
-                print(f"\nCannot process prompt \n{user_input}\n", e)
+            process_user_input(chat, user_input)
 
 
 if __name__ == "__main__":
