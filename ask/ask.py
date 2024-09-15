@@ -8,6 +8,7 @@ from typing import Optional
 from collections.abc import Iterable
 
 from .prompt import get_prompt
+from .input import get_more_input_with_wait
 from .save import save
 
 
@@ -81,16 +82,21 @@ def main() -> None:
             )
             or (args.inputs and "answer what I just asked")
             or "you start"
-        )
+        ).strip()
+        user_input += get_more_input_with_wait()
         if user_input.lower() == "save":
             save(response_text)
             continue
         if user_input.lower().endswith("ignore"):
             continue
-        assert user_input
-        response = chat.send_message(user_input)
-        response_text = response.text
-        print(response_text)
+        if len(user_input) > 0:
+            try:
+                response = chat.send_message(user_input)
+                response_text = response.text
+                print("\n   -) ...                                     ...\n")
+                print(response_text)
+            except Exception as e:
+                print(f"\nCannot process prompt \n{user_input}\n", e)
 
 
 if __name__ == "__main__":
