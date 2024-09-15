@@ -8,6 +8,9 @@ from that context.
 
 ![example usage](./docs/example-usage.png)
 
+You can try this out at no cost if you are in a region that is eligible for the
+Gemini API free usage.
+
 ## Installation
 
 You can either run direct from source
@@ -27,7 +30,7 @@ Or install globally in editable mode, for example if you want to make modificati
 
 ## Getting started
 
-You'll need a Gemini API Key to get started.  You can get one from the [Google AI Studio](https://aistudio.google.com/). Set the key as an environment variable.
+You'll need a Gemini API Key to get started. You can get one from the [Google AI Studio](https://aistudio.google.com/). Set the key as an environment variable.
 
     export GEMINI_API_KEY=my-super-secret-key
 
