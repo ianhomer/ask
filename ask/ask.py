@@ -6,6 +6,8 @@ import os
 import argparse
 from typing import Optional
 from collections.abc import Iterable
+from rich import print
+from rich.markdown import Markdown
 
 from .prompt import get_prompt
 from .input import get_more_input_with_wait
@@ -44,10 +46,13 @@ if args.dry:
 
 def process_user_input(chat, user_input: str) -> None:
     try:
+        print(
+            "\n[bold bright_yellow]   -) ...                                     ...[/bold bright_yellow]\n"
+        )
         response = chat.send_message(user_input)
         response_text = response.text
-        print("\n   -) ...                                     ...\n")
-        print(response_text)
+        markdown = Markdown(response_text)
+        print(markdown)
     except Exception as e:
         print(f"\nCannot process prompt \n{user_input}\n", e)
 
@@ -85,8 +90,9 @@ def main() -> None:
 
     response_text = ""
     while True:
+        print("[bold orange3](-_-)[/bold orange3]", end="")
         user_input = (
-            input("(-_-) ")
+            input(" ")
             or (
                 file_input
                 and "Proof read what I just gave you and tell me how to improve"
