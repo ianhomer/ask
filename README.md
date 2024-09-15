@@ -6,6 +6,8 @@ start the chat bot you provide a context, either an opening question, file
 inputs or a prompt template. From that point you can ask further questions
 from that context.
 
+![example usage](./docs/example-usage.png)
+
 ## Installation
 
 You can either run direct from source

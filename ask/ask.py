@@ -47,7 +47,7 @@ if args.dry:
 def process_user_input(chat, user_input: str) -> None:
     try:
         print(
-            "\n[bold bright_yellow]   -) ...                                     ...[/bold bright_yellow]\n"
+            "[bold bright_yellow]   -) ...                                     ...[/bold bright_yellow]\n"
         )
         response = chat.send_message(user_input)
         response_text = response.text
