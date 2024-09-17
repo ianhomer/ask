@@ -7,7 +7,7 @@ import re
 
 running = False
 
-excludes = [r"^\([^\)]*\)$", r"^\[[^\]]*\]$", r"^Thank you.$"]
+excludes = [r"^\([^\)]*\)$", r"^\[[^\]]*\]$", r"^thank you[\.]?$", r"^\.$"]
 
 
 def stop_transcribe():
@@ -44,8 +44,9 @@ def transcribe_filter(raw_line):
     line = raw_line.strip()
     if len(line) == 0:
         return None
+    line_lower = line.lower()
     for pattern in excludes:
-        if re.match(pattern, line):
+        if re.match(pattern, line_lower):
             return None
 
     return line
