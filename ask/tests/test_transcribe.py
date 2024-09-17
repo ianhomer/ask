@@ -12,3 +12,6 @@ def test_square_bracket_message_with_space():
 
 def test_round_bracket_message():
     assert not transcribe_filter("(message)")
+
+def test_noise_words():
+    assert not transcribe_filter("Thank you.")

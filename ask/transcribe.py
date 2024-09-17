@@ -7,7 +7,7 @@ import re
 
 running = False
 
-excludes = [r"\([^\)]*\)", r"\[[^\]]*\]"]
+excludes = [r"^\([^\)]*\)$", r"^\[[^\]]*\]$", r"^Thank you.$"]
 
 
 def stop_transcribe():
