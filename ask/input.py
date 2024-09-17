@@ -1,10 +1,19 @@
 import sys
 import select
+from prompt_toolkit import PromptSession
+
+prompt_session = PromptSession()
+
+
+class InputInterrupt(KeyboardInterrupt):
+    pass
 
 
 def get_input():
-    return input(" ").strip() + get_more_input_with_wait()
-
+    try:
+        return prompt_session.prompt(" ").strip() + get_more_input_with_wait()
+    except KeyboardInterrupt as e:
+        raise InputInterrupt(e)
 
 def get_more_input_with_wait(timeout=1):
     no_more_input = False

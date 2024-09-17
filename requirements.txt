@@ -1,3 +1,4 @@
 google-generativeai
+prompt_toolkit
 pypdf
 rich

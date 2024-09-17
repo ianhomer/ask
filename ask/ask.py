@@ -1,21 +1,25 @@
+import argparse
+import os
+import readline
 import signal
 import sys
+import threading
+from collections.abc import Iterable
+from typing import Optional
+
 import google.generativeai as genai
 from google.generativeai.types import content_types
-import os
-import argparse
-from typing import Optional
-from collections.abc import Iterable
 from rich import print
 from rich.markdown import Markdown
-import threading
-import readline
 
+from .input import (
+    InputInterrupt,
+    get_input,
+    get_more_input_with_wait,
+)
 from .prompt import get_prompt
-from .input import get_input, get_more_input_with_wait
 from .save import save
 from .transcribe import register_transcribed_text, stop_transcribe
-
 
 transcribe_thread: Optional[threading.Thread] = None
 
@@ -25,6 +29,10 @@ readline.parse_and_bind("set editing-mode vi")
 
 
 def signal_handler(sig: int, frame: Optional[object]) -> None:
+    quit()
+
+
+def quit() -> None:
     print("\nBye ...")
     if transcribe_thread:
         stop_transcribe()
@@ -114,7 +122,11 @@ def main() -> None:
 
     while True:
         print("[bold orange3](-_-)[/bold orange3]", end="")
-        user_input = get_input()
+        try:
+            user_input = get_input()
+        except InputInterrupt:
+            quit()
+            break
 
         if user_input.lower() == "save":
             save(response_text)

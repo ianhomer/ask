@@ -1,10 +1,10 @@
 import os
 import time
-import readline
 import threading
 from typing import Optional
 import re
-from keyboard import press
+from .input import prompt_session
+from typing import List
 
 running = False
 
@@ -36,30 +36,36 @@ def transcribe_worker(transcribe_filename):
             loops_before_submit = 4
             line_inserted = False
             while running:
-                line = transcribe_filter(file.read())
-                if line:
-                    loops_before_submit = 4
-                    line_inserted = True
-                    readline.insert_text(" " + line)
-                    readline.redisplay()
-                if line_inserted:
-                    if loops_before_submit < 1:
-                        if len(readline.get_line_buffer()) > 0:
-                            readline.insert_text("\n")
-                            readline.redisplay()
-                        line_inserted = False
-                    else:
-                        loops_before_submit -= 1
+                if prompt_session.app.is_running:
+                    current_buffer = prompt_session.app.current_buffer
+                    line = transcribe_filter(file.read())
+                    if line:
+                        loops_before_submit = 4
+                        line_inserted = True
+                        current_buffer.insert_text(" " + line)
+                    if line_inserted:
+                        if loops_before_submit < 1:
+                            if len(current_buffer.text) > 0:
+                                current_buffer.validate_and_handle()
+                            line_inserted = False
+                        else:
+                            loops_before_submit -= 1
                 time.sleep(0.5)
 
 
-def transcribe_filter(raw_line):
+def filter_line(raw_line) -> Optional[str]:
     line = raw_line.strip()
-    if len(line) == 0:
-        return None
-    line_lower = line.lower()
     for pattern in excludes:
-        if re.match(pattern, line_lower):
+        if re.match(pattern, line, re.IGNORECASE):
             return None
-
     return line
+
+
+def transcribe_filter(raw_line):
+    lines: List[str] = [
+        line for line in [filter_line(line) for line in raw_line.split("\n")] if line
+    ]
+    if len(lines) == 0:
+        return None
+
+    return "\n".join(lines)
