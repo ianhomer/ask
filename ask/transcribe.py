@@ -53,7 +53,7 @@ def transcribe_worker(transcribe_filename):
                 time.sleep(0.5)
 
 
-def filter_line(raw_line) -> Optional[str]:
+def filter_single_line(raw_line) -> Optional[str]:
     line = raw_line.strip()
     for pattern in excludes:
         if re.match(pattern, line, re.IGNORECASE):
@@ -63,7 +63,7 @@ def filter_line(raw_line) -> Optional[str]:
 
 def transcribe_filter(raw_line):
     lines: List[str] = [
-        line for line in [filter_line(line) for line in raw_line.split("\n")] if line
+        line for line in [filter_single_line(line) for line in raw_line.split("\n")] if line
     ]
     if len(lines) == 0:
         return None

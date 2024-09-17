@@ -1,6 +1,5 @@
 import argparse
 import os
-import readline
 import signal
 import sys
 import threading
@@ -15,17 +14,15 @@ from rich.markdown import Markdown
 from .input import (
     InputInterrupt,
     get_input,
-    get_more_input_with_wait,
 )
 from .prompt import get_prompt
 from .save import save
 from .transcribe import register_transcribed_text, stop_transcribe
+from .config import load_config
 
 transcribe_thread: Optional[threading.Thread] = None
 
-readline.parse_and_bind("set editing-mode vi")
-# readline.parse_and_bind("set echo-control-characters off")
-# readline.parse_and_bind("set input-meta on")
+config = load_config()
 
 
 def signal_handler(sig: int, frame: Optional[object]) -> None:
@@ -77,7 +74,10 @@ def process_user_input(chat, user_input: str) -> None:
         print(f"\nCannot process prompt \n{user_input}\n", e)
 
 
-transcribe_filename = "/tmp/transcribe.txt"
+transcribe_filename = config.get(
+    "transcribe", "filename", fallback="/tmp/transcribe.txt"
+)
+print(transcribe_filename)
 
 
 def main() -> None:
