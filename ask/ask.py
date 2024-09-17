@@ -8,14 +8,21 @@ from typing import Optional
 from collections.abc import Iterable
 from rich import print
 from rich.markdown import Markdown
+import threading
 
 from .prompt import get_prompt
 from .input import get_more_input_with_wait
 from .save import save
+from .transcribe import register_transcribed_text, stop_transcribe
+
+
+transcribe_thread: Optional[threading.Thread] = None
 
 
 def signal_handler(sig: int, frame: Optional[object]) -> None:
     print("\nBye ...")
+    if transcribe_thread:
+        stop_transcribe()
     sys.exit(0)
 
 
@@ -57,7 +64,15 @@ def process_user_input(chat, user_input: str) -> None:
         print(f"\nCannot process prompt \n{user_input}\n", e)
 
 
+
+
+
+
+transcribe_filename = "/tmp/transcribe.txt"
+
+
 def main() -> None:
+    global transcribe_thread
     if API_KEY_NAME not in os.environ:
         print(
             f"""
@@ -89,6 +104,7 @@ def main() -> None:
     chat = model.start_chat(history=history)
 
     response_text = ""
+    transcribe_thread = register_transcribed_text(transcribe_filename)
     while True:
         print("[bold orange3](-_-)[/bold orange3]", end="")
         user_input = (

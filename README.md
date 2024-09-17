@@ -11,6 +11,8 @@ from that context.
 You can try this out at no cost if you are in a region that is eligible for the
 Gemini API free usage.
 
+If you set up an voice to text transcribe service then you can control the command line with voice. See below for details.
+
 ## Installation
 
 You can either run direct from source
@@ -48,6 +50,20 @@ Or ask a question to work on
 
 Hit return to ask the default question, e.g. proof read or answer the question.
 Or elaborate and ask more.
+
+## Voice to text
+
+Provide inputs from voice by setting up a text service that outputs transcribed
+text to the file `/tmp/transcribe.txt`.
+
+For example build [whisper.cpp](https://github.com/ggerganov/whisper.cpp) and run in another shell.
+
+    git clone https://github.com/ggerganov/whisper.cpp.git
+    cd whisper.cpp
+    bash ./models/download-ggml-model.sh small.en
+    make
+    ./stream -m models/ggml-small.en.bin -t 10 --step 2000 --length 2000 --keep 500 \
+              -vth 0.1 -f /tmp/transcribe.txt
 
 ## Example
 
