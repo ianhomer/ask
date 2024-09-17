@@ -2,7 +2,11 @@ import sys
 import select
 
 
-def get_more_input_with_wait(timeout=0.5):
+def get_input():
+    return input(" ").strip() + get_more_input_with_wait()
+
+
+def get_more_input_with_wait(timeout=1):
     no_more_input = False
     input = ""
     while not no_more_input:

@@ -9,14 +9,19 @@ from collections.abc import Iterable
 from rich import print
 from rich.markdown import Markdown
 import threading
+import readline
 
 from .prompt import get_prompt
-from .input import get_more_input_with_wait
+from .input import get_input, get_more_input_with_wait
 from .save import save
 from .transcribe import register_transcribed_text, stop_transcribe
 
 
 transcribe_thread: Optional[threading.Thread] = None
+
+readline.parse_and_bind("set editing-mode vi")
+# readline.parse_and_bind("set echo-control-characters off")
+# readline.parse_and_bind("set input-meta on")
 
 
 def signal_handler(sig: int, frame: Optional[object]) -> None:
@@ -64,10 +69,6 @@ def process_user_input(chat, user_input: str) -> None:
         print(f"\nCannot process prompt \n{user_input}\n", e)
 
 
-
-
-
-
 transcribe_filename = "/tmp/transcribe.txt"
 
 
@@ -105,18 +106,15 @@ def main() -> None:
 
     response_text = ""
     transcribe_thread = register_transcribed_text(transcribe_filename)
+    if args.inputs or file_input:
+        process_user_input(
+            chat,
+            "answer or do what I just asked. If you have no answer, just say the word :'OK'",
+        )
+
     while True:
         print("[bold orange3](-_-)[/bold orange3]", end="")
-        user_input = (
-            input(" ")
-            or (
-                file_input
-                and "Proof read what I just gave you and tell me how to improve"
-            )
-            or (args.inputs and "answer what I just asked")
-            or "you start"
-        ).strip()
-        user_input += get_more_input_with_wait()
+        user_input = get_input()
 
         if user_input.lower() == "save":
             save(response_text)

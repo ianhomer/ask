@@ -4,6 +4,7 @@ import readline
 import threading
 from typing import Optional
 import re
+from keyboard import press
 
 running = False
 
@@ -32,12 +33,24 @@ def transcribe_worker(transcribe_filename):
     if os.path.exists(transcribe_filename):
         with open(transcribe_filename, "r") as file:
             file.seek(0, 2)
+            loops_before_submit = 4
+            line_inserted = False
             while running:
                 line = transcribe_filter(file.read())
                 if line:
-                    readline.insert_text(line)
+                    loops_before_submit = 4
+                    line_inserted = True
+                    readline.insert_text(" " + line)
                     readline.redisplay()
-                time.sleep(1)
+                if line_inserted:
+                    if loops_before_submit < 1:
+                        if len(readline.get_line_buffer()) > 0:
+                            readline.insert_text("\n")
+                            readline.redisplay()
+                        line_inserted = False
+                    else:
+                        loops_before_submit -= 1
+                time.sleep(0.5)
 
 
 def transcribe_filter(raw_line):
