@@ -46,6 +46,9 @@ parser.add_argument(
     "--dry", help="Just output the prompt and then exit", action="store_true"
 )
 parser.add_argument("--line-target", help="Line target for output")
+parser.add_argument(
+    "--no-transcribe", help="Disable transcribe reading", action="store_true"
+)
 
 
 args = parser.parse_args()
@@ -77,7 +80,6 @@ def process_user_input(chat, user_input: str) -> None:
 transcribe_filename = config.get(
     "transcribe", "filename", fallback="/tmp/transcribe.txt"
 )
-print(transcribe_filename)
 
 
 def main() -> None:
@@ -113,7 +115,8 @@ def main() -> None:
     chat = model.start_chat(history=history)
 
     response_text = ""
-    transcribe_thread = register_transcribed_text(transcribe_filename)
+    if not args.no_transcribe:
+        transcribe_thread = register_transcribed_text(transcribe_filename)
     if args.inputs or file_input:
         process_user_input(
             chat,
@@ -121,7 +124,6 @@ def main() -> None:
         )
 
     while True:
-        print("[bold orange3](-_-)[/bold orange3]", end="")
         try:
             user_input = get_input()
         except InputInterrupt:
