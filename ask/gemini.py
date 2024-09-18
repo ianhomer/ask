@@ -64,7 +64,7 @@ class Gemini(BotService):
             return previous_response_text
 
         if ("copy code" in user_input_lower and len(user_input) < 12) or (
-            "copy" in user_input_lower and len(user_input < 7)
+            "copy" in user_input_lower and len(user_input) < 7
         ):
             return copy_code(previous_response_text)
 
