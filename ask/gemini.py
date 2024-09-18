@@ -48,9 +48,6 @@ class Gemini(BotService):
 
     def process_user_input(self, user_input: str) -> Optional[str]:
         try:
-            print(
-                "[bold bright_yellow]   -) ...                                     ...[/bold bright_yellow]\n"
-            )
             response = self.chat.send_message(user_input)
             return response.text
         except Exception as e:

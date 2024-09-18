@@ -78,6 +78,9 @@ def main(
     service = Service(prompt=prompt, line_target=args.line_target)
 
     def process(user_input, response_text: Optional[str] = None) -> Optional[str]:
+        print(
+            "[bold bright_yellow]   -) ...                                     ...[/bold bright_yellow]\n"
+        )
         response_text = service.process(user_input, response_text)
         if response_text:
             if args.no_markdown:
