@@ -8,7 +8,16 @@ from typing import List
 
 running = False
 
-excludes = [r"^\([^\)]*\)$", r"^\[[^\]]*\]$", r"^thank you[\.]?$", r"^\.$"]
+# whisper generates descriptions of sounds (in square or round brakects) and
+# sometimes generates random words. We can filter these out since they have
+# limited value for this chat bot context.
+excludes = [
+    r"^\([^\)]*\)$",
+    r"^\[[^\]]*\]$",
+    r"^thank you[\.]?$",
+    r"^you[\.]?$",
+    r"^\.$",
+]
 
 
 def stop_transcribe():
@@ -43,7 +52,7 @@ def transcribe_worker(transcribe_filename):
                     if chunk:
                         loops_before_submit = 4
                         line_inserted = True
-                        for line in chunk.split('\n'):
+                        for line in chunk.split("\n"):
                             if line != last_line:
                                 current_buffer.insert_text(" " + line)
                                 last_line = line
@@ -67,7 +76,9 @@ def filter_single_line(raw_line) -> Optional[str]:
 
 def transcribe_filter(raw_line):
     lines: List[str] = [
-        line for line in [filter_single_line(line) for line in raw_line.split("\n")] if line
+        line
+        for line in [filter_single_line(line) for line in raw_line.split("\n")]
+        if line
     ]
     if len(lines) == 0:
         return None
