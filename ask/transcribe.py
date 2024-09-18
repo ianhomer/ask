@@ -12,10 +12,12 @@ running = False
 # sometimes generates random words. We can filter these out since they have
 # limited value for this chat bot context.
 excludes = [
-    r"^\([^\)]*\)$",
-    r"^\[[^\]]*\]$",
+    r"^\([^\)]+\)$",
+    r"^\[[^\]]+\]$",
+    r"^\*[^\*]+\*$",
     r"^thank you[\.]?$",
     r"^you[\.]?$",
+    r"^yeah[\.]?$",
     r"^\.$",
 ]
 
@@ -43,7 +45,7 @@ def transcribe_worker(transcribe_filename):
     if os.path.exists(transcribe_filename):
         with open(transcribe_filename, "r") as file:
             file.seek(0, 2)
-            loops_before_submit = 4
+            loops_before_submit = 0
             line_inserted = False
             while running:
                 if prompt_session.app.is_running:
@@ -60,7 +62,7 @@ def transcribe_worker(transcribe_filename):
                         if loops_before_submit < 1:
                             if len(current_buffer.text) > 0:
                                 current_buffer.validate_and_handle()
-                            line_inserted = False
+                                line_inserted = False
                         else:
                             loops_before_submit -= 1
                 time.sleep(0.5)

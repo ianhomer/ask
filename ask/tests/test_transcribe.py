@@ -5,6 +5,9 @@ def test_not_filtered():
     assert transcribe_filter("Hello") == "Hello"
 
 
+def test_starred_message():
+    assert not transcribe_filter("*snap*")
+
 def test_square_bracket_message():
     assert not transcribe_filter("[message]")
 

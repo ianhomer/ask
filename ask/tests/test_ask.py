@@ -38,6 +38,7 @@ def test_ask_main():
     with patch("sys.stdout", new=StringIO()) as captured_output:
         main(inputter=get_input, Service=MockBotService, parse_args=parse_args)
         lines = [line for line in captured_output.getvalue().split("\n") if line]
-        assert lines[0] == "OK"
+        assert lines[0] == "   -) ...                                     ..."
+        assert lines[1] == "OK"
         assert lines[-1] == "Bye ..."
-        assert len(lines) == 2
+        assert len(lines) == 3
