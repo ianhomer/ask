@@ -1,6 +1,7 @@
 import sys
 import select
 from prompt_toolkit import PromptSession
+from prompt_toolkit.formatted_text import AnyFormattedText
 from prompt_toolkit.styles import Style
 
 prompt_session: PromptSession = PromptSession()
@@ -12,7 +13,7 @@ class InputInterrupt(KeyboardInterrupt):
 
 style = Style.from_dict({"marker": "#FFA500 bold"})
 
-prompt_fragments = [("class:marker", "(-_-) ")]
+prompt_fragments : AnyFormattedText = [("class:marker", "(-_-) ")]
 
 
 def get_input():
