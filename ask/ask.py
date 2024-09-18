@@ -9,16 +9,15 @@ from typing import Optional
 import google.generativeai as genai
 from google.generativeai.types import content_types
 from rich import print
-from rich.markdown import Markdown
 
 from .input import (
     InputInterrupt,
     get_input,
 )
 from .prompt import get_prompt
-from .save import save
 from .transcribe import register_transcribed_text, stop_transcribe
 from .config import load_config
+from .process import process, process_user_input
 
 transcribe_thread: Optional[threading.Thread] = None
 
@@ -64,17 +63,6 @@ if args.dry:
     sys.exit(0)
 
 
-def process_user_input(chat, user_input: str) -> None:
-    try:
-        print(
-            "[bold bright_yellow]   -) ...                                     ...[/bold bright_yellow]\n"
-        )
-        response = chat.send_message(user_input)
-        response_text = response.text
-        markdown = Markdown(response_text)
-        print(markdown)
-    except Exception as e:
-        print(f"\nCannot process prompt \n{user_input}\n", e)
 
 
 transcribe_filename = config.get(
@@ -130,15 +118,7 @@ def main() -> None:
             quit()
             break
 
-        if user_input.lower() == "save":
-            save(response_text)
-            continue
-
-        if user_input.lower().endswith("ignore"):
-            continue
-
-        if len(user_input) > 0:
-            process_user_input(chat, user_input)
+        response_text = process(chat, user_input, response_text)
 
 
 if __name__ == "__main__":
