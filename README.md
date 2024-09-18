@@ -9,9 +9,6 @@ from that context.
 ![example usage](./docs/example-usage.png)
 
 
-https://github.com/user-attachments/assets/132c638c-0d87-4d8e-a5f9-89eb11fb5853
-
-
 ![ask chat bot with voice control](https://github.com/user-attachments/assets/132c638c-0d87-4d8e-a5f9-89eb11fb5853)
 
 You can try this out at no cost if you are in a region that is eligible for the
