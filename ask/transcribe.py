@@ -30,6 +30,7 @@ def register_transcribed_text(transcribe_filename) -> Optional[threading.Thread]
 
 def transcribe_worker(transcribe_filename):
     global running
+    last_line = None
     if os.path.exists(transcribe_filename):
         with open(transcribe_filename, "r") as file:
             file.seek(0, 2)
@@ -38,11 +39,14 @@ def transcribe_worker(transcribe_filename):
             while running:
                 if prompt_session.app.is_running:
                     current_buffer = prompt_session.app.current_buffer
-                    line = transcribe_filter(file.read())
-                    if line:
+                    chunk = transcribe_filter(file.read())
+                    if chunk:
                         loops_before_submit = 4
                         line_inserted = True
-                        current_buffer.insert_text(" " + line)
+                        for line in chunk.split('\n'):
+                            if line != last_line:
+                                current_buffer.insert_text(" " + line)
+                                last_line = line
                     if line_inserted:
                         if loops_before_submit < 1:
                             if len(current_buffer.text) > 0:
