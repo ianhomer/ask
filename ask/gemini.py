@@ -9,6 +9,7 @@ from rich import print
 from ask.service import BotService
 
 from .save import save
+from .copy import copy_code
 
 API_KEY_NAME = "GEMINI_API_KEY"
 
@@ -60,11 +61,15 @@ class Gemini(BotService):
     def process(
         self, user_input, previous_response_text: Optional[str] = None
     ) -> Optional[str]:
-        if user_input.lower() == "save":
+        user_input_lower = user_input.lower()
+        if user_input_lower == "save":
             save(previous_response_text)
             return previous_response_text
 
-        if user_input.lower().endswith("ignore"):
+        if "copy code" in user_input_lower and len(user_input) < 12:
+            return copy_code(previous_response_text)
+
+        if user_input_lower.endswith("ignore"):
             return None
 
         if len(user_input) > 0:
