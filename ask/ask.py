@@ -1,14 +1,12 @@
 import argparse
-import os
 import signal
 import sys
 import threading
-from collections.abc import Iterable
 from typing import Optional
 
-import google.generativeai as genai
-from google.generativeai.types import content_types
 from rich import print
+from rich.markdown import Markdown
+
 
 from .input import (
     InputInterrupt,
@@ -17,7 +15,8 @@ from .input import (
 from .prompt import get_prompt
 from .transcribe import register_transcribed_text, stop_transcribe
 from .config import load_config
-from .process import process, process_user_input
+from .gemini import Gemini
+from .service import BotService
 
 transcribe_thread: Optional[threading.Thread] = None
 
@@ -32,37 +31,9 @@ def quit() -> None:
     print("\nBye ...")
     if transcribe_thread:
         stop_transcribe()
-    sys.exit(0)
 
 
 signal.signal(signal.SIGINT, signal_handler)
-
-parser = argparse.ArgumentParser(description="Asker")
-
-parser.add_argument("inputs", help="Input content", nargs="*")
-parser.add_argument("--template", help="Input template")
-parser.add_argument(
-    "--dry", help="Just output the prompt and then exit", action="store_true"
-)
-parser.add_argument("--line-target", help="Line target for output")
-parser.add_argument(
-    "--no-transcribe", help="Disable transcribe reading", action="store_true"
-)
-
-
-args = parser.parse_args()
-
-API_KEY_NAME = "GEMINI_API_KEY"
-file_input = False
-
-prompt, file_input = get_prompt(args.inputs, args.template)
-
-if args.dry:
-    print("Prompt : ")
-    print(prompt)
-    sys.exit(0)
-
-
 
 
 transcribe_filename = config.get(
@@ -70,55 +41,70 @@ transcribe_filename = config.get(
 )
 
 
-def main() -> None:
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Asker")
+
+    parser.add_argument("inputs", help="Input content", nargs="*")
+    parser.add_argument("--template", help="Input template")
+    parser.add_argument(
+        "--dry", help="Just output the prompt and then exit", action="store_true"
+    )
+    parser.add_argument("--line-target", help="Line target for output", default=0)
+    parser.add_argument(
+        "--no-transcribe", help="Disable transcribe reading", action="store_true"
+    )
+    parser.add_argument(
+        "--no-markdown", help="Disable rendering of Markdown responses", action="store_true"
+    )
+
+    return parser.parse_args()
+
+
+def main(
+    inputter=get_input, Service: type[BotService] = Gemini, parse_args=parse_args
+) -> None:
     global transcribe_thread
-    if API_KEY_NAME not in os.environ:
-        print(
-            f"""
+    args = parse_args()
 
-  Please get a Gemini API key from https://aistudio.google.com/
-  and set in the environment variable {API_KEY_NAME}
+    file_input = False
 
-              """
-        )
-        sys.exit(1)
-    api_key = os.environ[API_KEY_NAME]
+    prompt, file_input = get_prompt(args.inputs, args.template)
 
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-1.5-flash")
-    history: Iterable[content_types.StrictContentType] = [
-        {"role": "user", "parts": [prompt]},
-        {"role": "model", "parts": ["Thanks, what would like?"]},
-    ]
-    if args.line_target:
-        history += [
-            {
-                "role": "user",
-                "parts": [
-                    f"Unless I say otherwise keep responses below {args.line_target} lines"
-                ],
-            },
-            {"role": "model", "parts": "I understand"},
-        ]
-    chat = model.start_chat(history=history)
+    if args.dry:
+        print("Prompt : ")
+        print(prompt)
+        sys.exit(0)
 
-    response_text = ""
+    service = Service(prompt=prompt, line_target=args.line_target)
+
+    def process(user_input, response_text: Optional[str] = None) -> Optional[str]:
+        response_text = service.process(user_input, response_text)
+        if response_text:
+            if args.no_markdown:
+                print(response_text)
+            else:
+                markdown = Markdown(response_text)
+                print(markdown)
+        return response_text
+
+    response_text: Optional[str] = None
+
     if not args.no_transcribe:
         transcribe_thread = register_transcribed_text(transcribe_filename)
     if args.inputs or file_input:
-        process_user_input(
-            chat,
-            "answer or do what I just asked. If you have no answer, just say the word :'OK'",
+        response_text = process(
+            "answer or do what I just asked. If you have no answer, "
+            + "just say the word :'OK'",
         )
 
     while True:
         try:
-            user_input = get_input()
+            user_input = inputter()
         except InputInterrupt:
             quit()
             break
 
-        response_text = process(chat, user_input, response_text)
+        response_text = process(user_input, response_text)
 
 
 if __name__ == "__main__":
