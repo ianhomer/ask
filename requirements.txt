@@ -2,4 +2,5 @@ configparser
 google-generativeai
 prompt_toolkit
 pypdf
+pyperclip
 rich
