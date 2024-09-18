@@ -18,6 +18,7 @@ excludes = [
     r"^thank you[\.]?$",
     r"^you[\.]?$",
     r"^yeah[\.]?$",
+    r"^\.+$",
     r"^\.$",
 ]
 
@@ -52,10 +53,10 @@ def transcribe_worker(transcribe_filename):
                     current_buffer = prompt_session.app.current_buffer
                     chunk = transcribe_filter(file.read())
                     if chunk:
-                        loops_before_submit = 4
-                        line_inserted = True
                         for line in chunk.split("\n"):
                             if line != last_line:
+                                line_inserted = True
+                                loops_before_submit = 4
                                 current_buffer.insert_text(" " + line)
                                 last_line = line
                     if line_inserted:
@@ -63,6 +64,8 @@ def transcribe_worker(transcribe_filename):
                             if len(current_buffer.text) > 0:
                                 current_buffer.validate_and_handle()
                                 line_inserted = False
+                            else:
+                                print("X" + current_buffer.text + "X")
                         else:
                             loops_before_submit -= 1
                 time.sleep(0.5)

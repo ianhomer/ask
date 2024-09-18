@@ -8,6 +8,12 @@ def test_not_filtered():
 def test_starred_message():
     assert not transcribe_filter("*snap*")
 
+
+def test_dots_message():
+    assert not transcribe_filter(".")
+    assert not transcribe_filter("...")
+
+
 def test_square_bracket_message():
     assert not transcribe_filter("[message]")
 
