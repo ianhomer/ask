@@ -4,7 +4,7 @@ import os
 
 
 from ..ask import main
-from .e2e_utils import parse_args, create_inputter
+from .e2e_utils import parse_args, create_inputter, CapturingRenderer
 
 
 @patch("google.generativeai.GenerativeModel")
@@ -12,14 +12,12 @@ def test_ask_gemini_key_required(GenerativeModel):
     mock = GenerativeModel()
     mock.start_chat().send_message().text = "mock-response"
 
-    with patch("sys.stdout", new=StringIO()) as captured_output:
-        main(inputter=create_inputter(), parse_args=parse_args)
-        assert (
-            "set in the environment variable GEMINI_API_KEY"
-            in captured_output.getvalue()
-        )
-        lines = [line for line in captured_output.getvalue().split("\n") if line]
-        assert len(lines) == 3
+    renderer = main(
+        inputter=create_inputter(), Renderer=CapturingRenderer, parse_args=parse_args
+    )
+    assert "set in the environment variable GEMINI_API_KEY" in renderer.messages[0]
+    lines = [line for line in renderer.body.split("\n") if line]
+    assert len(lines) == 3
 
 
 @patch("google.generativeai.GenerativeModel")

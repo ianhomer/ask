@@ -64,7 +64,7 @@ def main(
     Service: type[BotService] = Gemini,
     Renderer: type[AbstractRenderer] = RichRenderer,
     parse_args=parse_args,
-) -> None:
+) -> AbstractRenderer:
     global transcribe_thread
     args = parse_args()
 
@@ -75,9 +75,9 @@ def main(
     prompt, file_input = get_prompt(args.inputs, args.template)
 
     if args.dry:
-        print("Prompt : ")
-        print(prompt)
-        return
+        renderer.print("Prompt : ")
+        renderer.print(prompt)
+        return renderer
 
     service = Service(renderer=renderer, prompt=prompt, line_target=args.line_target)
 
@@ -105,6 +105,8 @@ def main(
             break
 
         response_text = process(user_input, response_text)
+
+    return renderer
 
 
 if __name__ == "__main__":

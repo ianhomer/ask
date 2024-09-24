@@ -15,8 +15,9 @@ API_KEY_NAME = "GEMINI_API_KEY"
 
 class Gemini(BotService):
     def __init__(self, prompt, renderer: AbstractRenderer, line_target=0) -> None:
+        self.renderer = renderer
         if API_KEY_NAME not in os.environ:
-            print(
+            self.renderer.print(
                 f"""
 
       Please get a Gemini API key from https://aistudio.google.com/
@@ -28,7 +29,6 @@ class Gemini(BotService):
             return
         self._available = True
         api_key = os.environ[API_KEY_NAME]
-        self.renderer = renderer
 
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel("gemini-1.5-flash")
