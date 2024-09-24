@@ -13,7 +13,8 @@ from .transcribe import register_transcribed_text, stop_transcribe
 from .config import load_config
 from .gemini import Gemini
 from .renderer import RichRenderer, AbstractRenderer
-from .service import BotService
+from .bot_service import BotService
+from .handler import InputHandler
 
 transcribe_thread: Optional[threading.Thread] = None
 
@@ -24,8 +25,8 @@ def signal_handler(sig: int, frame: Optional[object]) -> None:
     quit()
 
 
-def quit() -> None:
-    print("\nBye ...")
+def quit(renderer: AbstractRenderer) -> None:
+    renderer.print("\nBye ...")
     if transcribe_thread:
         stop_transcribe()
 
@@ -69,6 +70,7 @@ def main(
     args = parse_args()
 
     renderer = Renderer(pretty_markdown=not args.no_markdown)
+    input_handler = InputHandler(renderer=renderer)
 
     file_input = False
 
@@ -81,9 +83,9 @@ def main(
 
     service = Service(renderer=renderer, prompt=prompt, line_target=args.line_target)
 
-    def process(user_input, response_text: Optional[str] = None) -> Optional[str]:
+    def process(user_input) -> Optional[str]:
         renderer.print_processing()
-        response_text = service.process(user_input, response_text)
+        response_text = service.process(user_input)
         renderer.print_response(response_text)
         return response_text
 
@@ -101,10 +103,12 @@ def main(
         try:
             user_input = inputter()
         except InputInterrupt:
-            quit()
+            quit(renderer)
             break
-
-        response_text = process(user_input, response_text)
+        if user_input and len(user_input) > 0:
+            input_handler_response = input_handler.handle(user_input, response_text)
+            if input_handler_response.process:
+                response_text = process(user_input)
 
     return renderer
 

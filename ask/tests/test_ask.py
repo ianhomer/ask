@@ -2,7 +2,7 @@ from io import StringIO
 from unittest.mock import patch
 from typing import Optional
 
-from ask.service import BotService
+from ask.bot_service import BotService
 
 from .e2e_utils import parse_args, create_inputter
 from ..ask import main

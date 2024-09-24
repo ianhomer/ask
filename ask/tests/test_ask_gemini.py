@@ -48,17 +48,34 @@ const a = 1
 ```
 """
 
-    with patch("sys.stdout", new=StringIO()) as captured_output:
-        main(
-            inputter=create_inputter(inputs=["mock input 1", "copy code"]),
-            parse_args=parse_args,
-        )
-        lines = [line for line in captured_output.getvalue().split("\n") if line]
-        assert lines[0] == "   -) ...                                     ..."
-        assert lines[1].split("\n")[0] == "mock-response"
-        assert lines[-1] == "Bye ..."
-        assert len(lines) == 12
+    renderer = main(
+        inputter=create_inputter(inputs=["mock input 1", "copy code"]),
+        Renderer=CapturingRenderer,
+        parse_args=parse_args,
+    )
+    lines = [line for line in renderer.body.split("\n") if line]
+    assert lines[0] == "..."
+    assert lines[1].split("\n")[0] == "mock-response"
+    assert lines[-1] == "Bye ..."
+    assert len(lines) == 7
 
     copies = clipboard_copy.call_args_list
     assert len(copies) == 1
     assert "const a = 1" == copies[0][0][0]
+
+
+@patch("google.generativeai.GenerativeModel")
+@patch.dict(os.environ, {"GEMINI_API_KEY": "mock-api-key"})
+def test_ask_gemini_empty_inputs(GenerativeModel):
+    mock = GenerativeModel()
+    mock.start_chat().send_message().text = "mock-response"
+    renderer = main(
+        inputter=create_inputter(inputs=["mock input 1", "", "", ""]),
+        Renderer=CapturingRenderer,
+        parse_args=parse_args,
+    )
+    lines = [line for line in renderer.body.split("\n") if line]
+    assert lines[0] == "..."
+    assert lines[1] == "mock-response"
+    assert lines[-1] == "Bye ..."
+    assert len(lines) == 3
