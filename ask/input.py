@@ -32,6 +32,8 @@ def get_more_input_with_wait(timeout=1):
     while not no_more_input:
         if select.select([sys.stdin], [], [], timeout)[0]:
             input += sys.stdin.readline().strip()
+            if input == "quit":
+                no_more_input = True
         else:
             no_more_input = True
     return input

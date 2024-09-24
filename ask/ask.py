@@ -109,14 +109,17 @@ def run(
             break
         if user_input and len(user_input) > 0:
             input_handler_response = input_handler.handle(user_input, response_text)
+            if input_handler_response.quit:
+                quit(renderer)
+                break
             if input_handler_response.process:
                 response_text = process(user_input)
 
     return renderer
 
 
-def main(inputter: Callable[[], str] = get_input) -> None:
-    run(inputter=inputter)
+def main() -> None:
+    run()
     return
 
 

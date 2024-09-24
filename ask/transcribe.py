@@ -65,8 +65,6 @@ def transcribe_worker(transcribe_filename):
                             if len(current_buffer.text) > 0:
                                 current_buffer.validate_and_handle()
                                 line_inserted = False
-                            else:
-                                print("X" + current_buffer.text + "X")
                         else:
                             loops_before_submit -= 1
                 time.sleep(0.5)

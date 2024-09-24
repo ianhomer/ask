@@ -6,9 +6,10 @@ from .copy import copy_code
 
 
 class InputHandlerResponse:
-    def __init__(self, ignore=False, process=True) -> None:
+    def __init__(self, ignore=False, process=True, quit=False) -> None:
         self._ignore = ignore
         self._process = process
+        self._quit = quit
 
     @property
     def ignore(self):
@@ -18,8 +19,12 @@ class InputHandlerResponse:
     def process(self):
         return self._process
 
+    @property
+    def quit(self):
+        return self._quit
+
     def __str__(self) -> str:
-        return f"ignore:{self._ignore}, process:{self._process}"
+        return f"ignore:{self._ignore}, process:{self._process}, quit:{self._quit}"
 
 
 class InputHandler:
@@ -40,6 +45,9 @@ class InputHandler:
         ):
             copy_code(self.renderer, previous_response_text)
             return InputHandlerResponse(process=False)
+
+        if input_lower.endswith("quit"):
+            return InputHandlerResponse(quit=True)
 
         if input_lower.endswith("ignore"):
             return InputHandlerResponse(process=False, ignore=True)
