@@ -1,16 +1,17 @@
 import argparse
 from typing import Callable
+from collections import deque
 from ..input import InputInterrupt
 
 
-def create_inputter() -> Callable[[], str]:
-    inputs = ["mock input 1"]
+def create_inputter(inputs=["mock input 1"]) -> Callable[[], str]:
+    queue = deque(inputs)
 
     def get_input() -> str:
-        if len(inputs) == 0:
+        if len(queue) == 0:
             raise InputInterrupt()
 
-        return inputs.pop()
+        return queue.popleft()
 
     return get_input
 

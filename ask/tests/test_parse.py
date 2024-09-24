@@ -1,4 +1,4 @@
-from ..parse import parse
+from ..parse import parse_markdown_for_code_blocks
 
 
 def test_extract_code_block():
@@ -9,4 +9,4 @@ Hello
 <html></html>
 ```
         """
-    assert parse(markdown) == [("html", "<html></html>")]
+    assert parse_markdown_for_code_blocks(markdown) == [("html", "<html></html>")]

@@ -2,7 +2,7 @@ import datetime
 import os
 import webbrowser
 
-from .parse import parse
+from .parse import parse_markdown_for_code_blocks
 
 work_directory = "/tmp/ask"
 
@@ -19,7 +19,7 @@ def save(response_text):
     with open(f"{work_directory}/{filename}", "w") as file:
         file.write(response_text)
 
-    parts = parse(response_text)
+    parts = parse_markdown_for_code_blocks(response_text)
     if len(parts) > 0:
         type_counts = {}
         for part in parts:

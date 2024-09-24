@@ -63,10 +63,12 @@ class Gemini(BotService):
             save(previous_response_text)
             return previous_response_text
 
-        if ("copy code" in user_input_lower and len(user_input) < 12) or (
-            "copy" in user_input_lower and len(user_input) < 7
+        if previous_response_text and (
+            ("copy code" in user_input_lower and len(user_input) < 12)
+            or ("copy" in user_input_lower and len(user_input) < 7)
         ):
-            return copy_code(previous_response_text)
+            copy_code(previous_response_text)
+            return previous_response_text
 
         if user_input_lower.endswith("ignore"):
             return None
