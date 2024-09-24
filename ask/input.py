@@ -13,7 +13,7 @@ class InputInterrupt(KeyboardInterrupt):
 
 style = Style.from_dict({"marker": "#FFA500 bold"})
 
-prompt_fragments : AnyFormattedText = [("class:marker", "(-_-) ")]
+prompt_fragments: AnyFormattedText = [("class:marker", "(-_-) ")]
 
 
 def get_input() -> str:
@@ -31,9 +31,14 @@ def get_more_input_with_wait(timeout=1):
     input = ""
     while not no_more_input:
         if select.select([sys.stdin], [], [], timeout)[0]:
-            input += sys.stdin.readline().strip()
-            if input == "quit":
+            next_input = sys.stdin.readline().strip()
+            # <break> signal is currently only used in the full end to end test
+            # test_ask_main.py to indicate that we should stop processing this
+            # wait.  It would be good to find a better way of doing this and
+            # then remove the handling of this signal.
+            if next_input == "<break>":
                 no_more_input = True
+            input += next_input
         else:
             no_more_input = True
     return input

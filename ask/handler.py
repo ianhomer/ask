@@ -39,14 +39,21 @@ class InputHandler:
             save(previous_response_text)
             return InputHandlerResponse(process=False)
 
+
         if previous_response_text and (
-            ("copy code" in input_lower and len(input) < 12)
+            ("copy code" in input_lower and len(input) < 17)
             or ("copy" in input_lower and len(input) < 7)
         ):
             copy_code(self.renderer, previous_response_text)
             return InputHandlerResponse(process=False)
 
-        if input_lower.endswith("quit"):
+        # The handling for <quit> is currently only used within end to end
+        # tests and may be removed.
+        if (
+            input_lower == "quit"
+            or input_lower.endswith("<quit>")
+            or input_lower.startswith("<quit>")
+        ):
             return InputHandlerResponse(quit=True)
 
         if input_lower.endswith("ignore"):
