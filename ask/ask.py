@@ -1,11 +1,7 @@
 import argparse
 import signal
-import sys
 import threading
 from typing import Optional, Callable
-
-from rich import print
-from rich.markdown import Markdown
 
 
 from .input import (
@@ -16,6 +12,7 @@ from .prompt import get_prompt
 from .transcribe import register_transcribed_text, stop_transcribe
 from .config import load_config
 from .gemini import Gemini
+from .renderer import RichRenderer, AbstractRenderer
 from .service import BotService
 
 transcribe_thread: Optional[threading.Thread] = None
@@ -65,10 +62,13 @@ def parse_args() -> argparse.Namespace:
 def main(
     inputter: Callable[[], str] = get_input,
     Service: type[BotService] = Gemini,
+    Renderer: type[AbstractRenderer] = RichRenderer,
     parse_args=parse_args,
 ) -> None:
     global transcribe_thread
     args = parse_args()
+
+    renderer = Renderer(pretty_markdown=not args.no_markdown)
 
     file_input = False
 
@@ -79,19 +79,12 @@ def main(
         print(prompt)
         return
 
-    service = Service(prompt=prompt, line_target=args.line_target)
+    service = Service(renderer=renderer, prompt=prompt, line_target=args.line_target)
 
     def process(user_input, response_text: Optional[str] = None) -> Optional[str]:
-        print(
-            "[bold bright_yellow]   -) ...                                     ...[/bold bright_yellow]\n"
-        )
+        renderer.print_processing()
         response_text = service.process(user_input, response_text)
-        if response_text:
-            if args.no_markdown:
-                print(response_text)
-            else:
-                markdown = Markdown(response_text)
-                print(markdown)
+        renderer.print_response(response_text)
         return response_text
 
     response_text: Optional[str] = None

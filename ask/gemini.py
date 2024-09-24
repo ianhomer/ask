@@ -1,11 +1,10 @@
 import os
-import sys
 from collections.abc import Iterable
 import google.generativeai as genai
 from google.generativeai.types import content_types
 from typing import Optional
-from rich import print
 
+from ask.renderer import AbstractRenderer
 from ask.service import BotService
 
 from .save import save
@@ -15,7 +14,7 @@ API_KEY_NAME = "GEMINI_API_KEY"
 
 
 class Gemini(BotService):
-    def __init__(self, prompt, line_target=0) -> None:
+    def __init__(self, prompt, renderer: AbstractRenderer, line_target=0) -> None:
         if API_KEY_NAME not in os.environ:
             print(
                 f"""
@@ -29,6 +28,7 @@ class Gemini(BotService):
             return
         self._available = True
         api_key = os.environ[API_KEY_NAME]
+        self.renderer = renderer
 
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel("gemini-1.5-flash")
@@ -73,7 +73,7 @@ class Gemini(BotService):
             ("copy code" in user_input_lower and len(user_input) < 12)
             or ("copy" in user_input_lower and len(user_input) < 7)
         ):
-            copy_code(previous_response_text)
+            copy_code(self.renderer, previous_response_text)
             return previous_response_text
 
         if user_input_lower.endswith("ignore"):

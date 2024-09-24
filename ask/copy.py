@@ -1,13 +1,11 @@
+from .renderer import AbstractRenderer
 from .parse import parse_markdown_for_code_blocks
 import pyperclip
-from rich import print
 
 
-def copy_code(response_text: str) -> None:
+def copy_code(renderer: AbstractRenderer, response_text: str) -> None:
     parts = parse_markdown_for_code_blocks(response_text)
 
     if len(parts) > 0:
-        print(
-            "[bold bright_yellow]   -) code copied into clipboard [/bold bright_yellow]\n"
-        )
+        renderer.print_message("code copied into clipboard")
         pyperclip.copy(parts[0][1])

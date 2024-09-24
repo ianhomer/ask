@@ -1,10 +1,12 @@
 from abc import abstractmethod
 from typing import Optional
 
+from .renderer import AbstractRenderer
+
 
 class BotService:
     @abstractmethod
-    def __init__(self, prompt: str, line_target: int) -> None:
+    def __init__(self, prompt: str, line_target: int, renderer: AbstractRenderer) -> None:
         pass
 
     @abstractmethod
