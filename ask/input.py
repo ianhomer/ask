@@ -16,7 +16,7 @@ style = Style.from_dict({"marker": "#FFA500 bold"})
 prompt_fragments : AnyFormattedText = [("class:marker", "(-_-) ")]
 
 
-def get_input():
+def get_input() -> str:
     try:
         return (
             prompt_session.prompt(prompt_fragments, style=style).strip()

@@ -1,6 +1,7 @@
 import argparse
 import signal
 import threading
+import sys
 from typing import Optional, Callable
 
 
@@ -22,7 +23,8 @@ config = load_config()
 
 
 def signal_handler(sig: int, frame: Optional[object]) -> None:
-    quit()
+    quit(RichRenderer())
+    sys.exit(0)
 
 
 def quit(renderer: AbstractRenderer) -> None:
@@ -60,7 +62,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def main(
+def run(
     inputter: Callable[[], str] = get_input,
     Service: type[BotService] = Gemini,
     Renderer: type[AbstractRenderer] = RichRenderer,
@@ -111,6 +113,11 @@ def main(
                 response_text = process(user_input)
 
     return renderer
+
+
+def main(inputter: Callable[[], str] = get_input) -> None:
+    run(inputter=inputter)
+    return
 
 
 if __name__ == "__main__":

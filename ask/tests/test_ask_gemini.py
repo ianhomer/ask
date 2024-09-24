@@ -3,7 +3,7 @@ from unittest.mock import patch
 import os
 
 
-from ..ask import main
+from ..ask import run
 from .e2e_utils import parse_args, create_inputter, CapturingRenderer
 
 
@@ -12,7 +12,7 @@ def test_ask_gemini_key_required(GenerativeModel):
     mock = GenerativeModel()
     mock.start_chat().send_message().text = "mock-response"
 
-    renderer = main(
+    renderer = run(
         inputter=create_inputter(), Renderer=CapturingRenderer, parse_args=parse_args
     )
     assert "set in the environment variable GEMINI_API_KEY" in renderer.messages[0]
@@ -27,7 +27,7 @@ def test_ask_gemini(GenerativeModel):
     mock.start_chat().send_message().text = "mock-response"
 
     with patch("sys.stdout", new=StringIO()) as captured_output:
-        main(inputter=create_inputter(), parse_args=parse_args)
+        run(inputter=create_inputter(), parse_args=parse_args)
         lines = [line for line in captured_output.getvalue().split("\n") if line]
         assert lines[0] == "   -) ...                                     ..."
         assert lines[1] == "mock-response"
@@ -48,7 +48,7 @@ const a = 1
 ```
 """
 
-    renderer = main(
+    renderer = run(
         inputter=create_inputter(inputs=["mock input 1", "copy code"]),
         Renderer=CapturingRenderer,
         parse_args=parse_args,
@@ -69,7 +69,7 @@ const a = 1
 def test_ask_gemini_empty_inputs(GenerativeModel):
     mock = GenerativeModel()
     mock.start_chat().send_message().text = "mock-response"
-    renderer = main(
+    renderer = run(
         inputter=create_inputter(inputs=["mock input 1", "", "", ""]),
         Renderer=CapturingRenderer,
         parse_args=parse_args,
