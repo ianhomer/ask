@@ -14,6 +14,10 @@ class MockBotService(BotService):
     ) -> Optional[str]:
         return "OK"
 
+    @property
+    def available(self):
+        return True
+
 
 def test_ask_main():
     with patch("sys.stdout", new=StringIO()) as captured_output:

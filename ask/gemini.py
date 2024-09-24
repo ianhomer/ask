@@ -25,7 +25,9 @@ class Gemini(BotService):
 
                   """
             )
-            sys.exit(1)
+            self._available = False
+            return
+        self._available = True
         api_key = os.environ[API_KEY_NAME]
 
         genai.configure(api_key=api_key)
@@ -45,6 +47,10 @@ class Gemini(BotService):
                 {"role": "model", "parts": "I understand"},
             ]
         self.chat = model.start_chat(history=history)
+
+    @property
+    def available(self) -> bool:
+        return self._available
 
     def process_user_input(self, user_input: str) -> Optional[str]:
         try:

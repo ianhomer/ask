@@ -77,7 +77,7 @@ def main(
     if args.dry:
         print("Prompt : ")
         print(prompt)
-        sys.exit(0)
+        return
 
     service = Service(prompt=prompt, line_target=args.line_target)
 
@@ -104,7 +104,7 @@ def main(
             + "just say the word :'OK'",
         )
 
-    while True:
+    while service.available:
         try:
             user_input = inputter()
         except InputInterrupt:

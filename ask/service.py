@@ -12,3 +12,8 @@ class BotService:
         self, user_input, previous_response_text: Optional[str] = None
     ) -> Optional[str]:
         pass
+
+    @property
+    @abstractmethod
+    def available(self) -> bool:
+        pass
