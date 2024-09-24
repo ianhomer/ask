@@ -2,7 +2,7 @@ import argparse
 import signal
 import sys
 import threading
-from typing import Optional
+from typing import Optional, Callable
 
 from rich import print
 from rich.markdown import Markdown
@@ -54,14 +54,18 @@ def parse_args() -> argparse.Namespace:
         "--no-transcribe", help="Disable transcribe reading", action="store_true"
     )
     parser.add_argument(
-        "--no-markdown", help="Disable rendering of Markdown responses", action="store_true"
+        "--no-markdown",
+        help="Disable rendering of Markdown responses",
+        action="store_true",
     )
 
     return parser.parse_args()
 
 
 def main(
-    inputter=get_input, Service: type[BotService] = Gemini, parse_args=parse_args
+    inputter: Callable[[], str] = get_input,
+    Service: type[BotService] = Gemini,
+    parse_args=parse_args,
 ) -> None:
     global transcribe_thread
     args = parse_args()
