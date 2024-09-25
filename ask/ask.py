@@ -13,6 +13,7 @@ from .prompt import get_prompt
 from .transcribe import register_transcribed_text, stop_transcribe
 from .config import load_config, default_parse_args
 from .gemini import Gemini
+from .ollama import Ollama
 from .renderer import RichRenderer, AbstractRenderer
 from .bot_service import BotService
 from .handler import InputHandler
@@ -36,7 +37,7 @@ signal.signal(signal.SIGINT, signal_handler)
 
 def run(
     inputter: AbstractInputter = PromptInputter(),
-    Service: type[BotService] = Gemini,
+    Service: Optional[type[BotService]] = None,
     Renderer: type[AbstractRenderer] = RichRenderer,
     parse_args=default_parse_args,
     config_file_name="~/.config/ask/ask.ini"
@@ -57,6 +58,12 @@ def run(
         renderer.print_line(prompt)
         return renderer
 
+    if not Service:
+        match config.service.provider.lower():
+            case "ollama":
+                Service = Ollama
+            case _:
+                Service = Gemini
     service = Service(renderer=renderer, prompt=prompt, line_target=config.line_target)
 
     def process(user_input) -> Optional[str]:

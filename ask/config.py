@@ -10,6 +10,7 @@ def default_parse_args() -> argparse.Namespace:
 
     parser.add_argument("inputs", help="Input content", nargs="*")
     parser.add_argument("--template", help="Input template")
+    parser.add_argument("--provider", help="Service provider", default="Gemini")
     parser.add_argument(
         "--transcribe-filename",
         help="File name for transcribed inputs",
@@ -94,7 +95,9 @@ class ServiceConfig:
 
     @property
     def provider(self) -> str:
-        return self.config.get(self.section_name, "provider", fallback="Gemini")
+        return self.config.get(
+            self.section_name, "provider", fallback=self.args.provider
+        )
 
 
 class TranscribeConfig:

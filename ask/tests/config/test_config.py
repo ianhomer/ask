@@ -8,7 +8,7 @@ TESTS_DIRECTORY = os.path.dirname(__file__)
 def test_config_defaults():
     config = load_config(mock_parse_args, f"{TESTS_DIRECTORY}/empty.ini")
 
-    assert config.service.provider == "Gemini"
+    assert config.service.provider == "mock"
     assert config.service.model == "gemini-1.5-flash"
     assert config.transcribe.filename == "/tmp/transcribe.txt"
 
