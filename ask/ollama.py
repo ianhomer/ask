@@ -11,6 +11,6 @@ class Ollama(BotService):
     def process(self, user_input: Optional[str]) -> Optional[str]:
         response = requests.post(
             "http://localhost:11434/api/generate",
-            json={"model": "qwen2.5:7b", "prompt": user_input, "stream": False},
+            json={"model": "qwen2.5:1.5b", "prompt": user_input, "stream": False},
         )
         return response.json()["response"]
