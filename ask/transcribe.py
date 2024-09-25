@@ -39,7 +39,7 @@ def is_running():
 
 
 def register_transcribed_text(
-    transcribe_filename, inputter, loop_sleep=2
+    transcribe_filename, inputter, loop_sleep: float = 2
 ) -> Optional[threading.Thread]:
     global running
     if os.path.exists(transcribe_filename):

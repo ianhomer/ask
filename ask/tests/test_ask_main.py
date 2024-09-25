@@ -2,7 +2,7 @@ import os
 from unittest.mock import patch
 from io import StringIO
 from ..ask import main
-from .e2e_utils import parse_args
+from .e2e_utils import mock_parse_args
 
 
 # Test the main entry point as used by the CLI. Other end to end tests use the
@@ -26,7 +26,7 @@ const a = 1
     prompt.side_effect = ["mock input", "copy code", "<quit>"]
     stdin.fileno.return_value = 1
     stdin.readline.return_value = "<break>"
-    ArgumentParser().parse_args.return_value = parse_args()
+    ArgumentParser().parse_args.return_value = mock_parse_args()
 
     with patch("sys.stdout", new=StringIO()) as captured_output:
         main()

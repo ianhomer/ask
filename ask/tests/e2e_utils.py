@@ -15,12 +15,13 @@ class MockInputter(AbstractInputter):
         return self.queue.popleft()
 
 
-def parse_args():
+def mock_parse_args():
     return argparse.Namespace(
         dry=False,
         inputs=[],
         line_target=0,
         transcribe_loop_sleep=0.5,
+        transcribe_filename="/tmp/transcribe.txt",
         no_markdown=True,
         no_transcribe=True,
         template=None,

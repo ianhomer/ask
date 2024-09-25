@@ -28,7 +28,6 @@ class TranscribePromptInputter(AbstractInputter):
 
     def get_input(self) -> str:
         while not is_running():
-            print(str(is_running()))
             time.sleep(0.5)
         input = self.get_raw_input()
         while input.startswith("<transcribed>"):
