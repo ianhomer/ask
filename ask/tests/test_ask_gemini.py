@@ -4,7 +4,7 @@ import os
 
 
 from ..ask import run
-from .e2e_utils import parse_args, create_inputter, CapturingRenderer
+from .e2e_utils import MockInputter, parse_args, CapturingRenderer
 
 
 @patch("google.generativeai.GenerativeModel")
@@ -13,7 +13,7 @@ def test_ask_gemini_key_required(GenerativeModel):
     mock.start_chat().send_message().text = "mock-response"
 
     renderer = run(
-        inputter=create_inputter(), Renderer=CapturingRenderer, parse_args=parse_args
+        inputter=MockInputter(), Renderer=CapturingRenderer, parse_args=parse_args
     )
     assert "set in the environment variable GEMINI_API_KEY" in renderer.messages[0]
     lines = [line for line in renderer.body.split("\n") if line]
@@ -27,7 +27,7 @@ def test_ask_gemini(GenerativeModel):
     mock.start_chat().send_message().text = "mock-response"
 
     with patch("sys.stdout", new=StringIO()) as captured_output:
-        run(inputter=create_inputter(), parse_args=parse_args)
+        run(inputter=MockInputter(), parse_args=parse_args)
         lines = [line for line in captured_output.getvalue().split("\n") if line]
         assert lines[0] == "   -) ...                                     ..."
         assert lines[1] == "mock-response"
@@ -49,7 +49,7 @@ const a = 1
 """
 
     renderer = run(
-        inputter=create_inputter(inputs=["mock input 1", "copy code"]),
+        inputter=MockInputter(inputs=["mock input 1", "copy code"]),
         Renderer=CapturingRenderer,
         parse_args=parse_args,
     )
@@ -70,7 +70,7 @@ def test_ask_gemini_empty_inputs(GenerativeModel):
     mock = GenerativeModel()
     mock.start_chat().send_message().text = "mock-response"
     renderer = run(
-        inputter=create_inputter(inputs=["mock input 1", "", "", ""]),
+        inputter=MockInputter(inputs=["mock input 1", "", "", ""]),
         Renderer=CapturingRenderer,
         parse_args=parse_args,
     )

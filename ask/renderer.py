@@ -10,23 +10,32 @@ class AbstractRenderer:
         self._messages: List[str] = []
 
     def record(self, message):
-        self._messages.append(message)
+        if message and message != "\n":
+            self._messages.append(message)
 
     @abstractmethod
     def print(self, message):
         pass
 
+    @abstractmethod
+    def print_carriage_return(self):
+        pass
+
+    def print_line(self, message):
+        self.print(message)
+        self.print("\n")
+
     def print_processing(self):
-        self.print("...\n")
+        self.print_line("...")
 
     @abstractmethod
     def print_response(self, response_text: Optional[str]):
         if response_text:
-            self.print(response_text)
+            self.print_line(response_text)
 
     @abstractmethod
     def print_message(self, message: str):
-        self.print(message)
+        self.print_line(message)
 
     @property
     def messages(self) -> List[str]:
@@ -42,17 +51,17 @@ class RichRenderer(AbstractRenderer):
         print(message)
 
     def print_processing(self):
-        self.print(
-            "[bold bright_yellow]   -) ...                                     ...[/bold bright_yellow]\n"
+        self.print_line(
+            "[bold bright_yellow]   -) ...                                     ...[/bold bright_yellow]"
         )
 
     def print_message(self, message: str):
-        self.print(f"[bold bright_yellow]   -) {message} [/bold bright_yellow]\n")
+        self.print_line(f"[bold bright_yellow]   -) {message} [/bold bright_yellow]")
 
     def print_response(self, response_text: Optional[str]):
         if response_text:
             if self.pretty_markdown:
                 markdown = Markdown(response_text)
-                self.print(markdown)
+                self.print_line(markdown)
             else:
-                self.print(response_text)
+                self.print_line(response_text)

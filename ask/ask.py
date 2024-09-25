@@ -2,12 +2,13 @@ import argparse
 import signal
 import threading
 import sys
-from typing import Optional, Callable
+from typing import Optional
 
 
 from .input import (
+    AbstractInputter,
     InputInterrupt,
-    get_input,
+    PromptInputter,
 )
 from .prompt import get_prompt
 from .transcribe import register_transcribed_text, stop_transcribe
@@ -28,7 +29,7 @@ def signal_handler(sig: int, frame: Optional[object]) -> None:
 
 
 def quit(renderer: AbstractRenderer) -> None:
-    renderer.print("\nBye ...")
+    renderer.print_line("Bye ...")
     if transcribe_thread:
         stop_transcribe()
 
@@ -36,7 +37,7 @@ def quit(renderer: AbstractRenderer) -> None:
 signal.signal(signal.SIGINT, signal_handler)
 
 
-transcribe_filename = config.get(
+default_transcribe_filename = config.get(
     "transcribe", "filename", fallback="/tmp/transcribe.txt"
 )
 
@@ -46,6 +47,16 @@ def parse_args() -> argparse.Namespace:
 
     parser.add_argument("inputs", help="Input content", nargs="*")
     parser.add_argument("--template", help="Input template")
+    parser.add_argument(
+        "--transcribe-filename",
+        help="File name for transcribed inputs",
+        default=default_transcribe_filename,
+    )
+    parser.add_argument(
+        "--transcribe-loop-sleep",
+        help="Sleep time for transcribe read loop",
+        default=0.5,
+    )
     parser.add_argument(
         "--dry", help="Just output the prompt and then exit", action="store_true"
     )
@@ -63,7 +74,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def run(
-    inputter: Callable[[], str] = get_input,
+    inputter: AbstractInputter = PromptInputter(),
     Service: type[BotService] = Gemini,
     Renderer: type[AbstractRenderer] = RichRenderer,
     parse_args=parse_args,
@@ -79,8 +90,8 @@ def run(
     prompt, file_input = get_prompt(args.inputs, args.template)
 
     if args.dry:
-        renderer.print("Prompt : ")
-        renderer.print(prompt)
+        renderer.print_line("Prompt : ")
+        renderer.print_line(prompt)
         return renderer
 
     service = Service(renderer=renderer, prompt=prompt, line_target=args.line_target)
@@ -94,7 +105,9 @@ def run(
     response_text: Optional[str] = None
 
     if not args.no_transcribe:
-        transcribe_thread = register_transcribed_text(transcribe_filename)
+        transcribe_thread = register_transcribed_text(
+            args.transcribe_filename, inputter, loop_sleep=args.transcribe_loop_sleep
+        )
     if args.inputs or file_input:
         response_text = process(
             "answer or do what I just asked. If you have no answer, "
@@ -103,7 +116,7 @@ def run(
 
     while service.available:
         try:
-            user_input = inputter()
+            user_input = inputter.get_input()
         except InputInterrupt:
             quit(renderer)
             break

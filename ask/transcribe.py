@@ -3,7 +3,6 @@ import time
 import threading
 from typing import Optional
 import re
-from .input import prompt_session
 from typing import List
 
 running = False
@@ -29,45 +28,51 @@ def stop_transcribe():
     running = False
 
 
-def register_transcribed_text(transcribe_filename) -> Optional[threading.Thread]:
+def is_running():
+    global running
+    return running
+
+
+def register_transcribed_text(
+    transcribe_filename, inputter, loop_sleep=0.5
+) -> Optional[threading.Thread]:
     global running
     if os.path.exists(transcribe_filename):
         transcribe_thread = threading.Thread(
-            target=transcribe_worker, args=(transcribe_filename,)
+            target=transcribe_worker, args=(transcribe_filename, inputter, loop_sleep)
         )
-        running = True
         transcribe_thread.start()
         return transcribe_thread
     return None
 
 
-def transcribe_worker(transcribe_filename):
+def transcribe_worker(transcribe_filename, inputter, loop_sleep):
     global running
     last_line = None
     if os.path.exists(transcribe_filename):
+        running = True
         with open(transcribe_filename, "r") as file:
             file.seek(0, 2)
             loops_before_submit = 0
             line_inserted = False
             while running:
-                if prompt_session.app.is_running:
-                    current_buffer = prompt_session.app.current_buffer
+                if inputter.is_running():
                     chunk = transcribe_filter(file.read())
                     if chunk:
                         for line in chunk.split("\n"):
                             if line != last_line:
                                 line_inserted = True
                                 loops_before_submit = 4
-                                current_buffer.insert_text(" " + line)
+                                inputter.write(" " + line)
                                 last_line = line
                     if line_inserted:
                         if loops_before_submit < 1:
-                            if len(current_buffer.text) > 0:
-                                current_buffer.validate_and_handle()
+                            if inputter.has_text():
+                                inputter.flush()
                                 line_inserted = False
                         else:
                             loops_before_submit -= 1
-                time.sleep(0.5)
+                time.sleep(loop_sleep)
 
 
 def filter_single_line(raw_line) -> Optional[str]:

@@ -1,20 +1,18 @@
 import argparse
-from typing import Callable
 from collections import deque
-from ..input import InputInterrupt
+from ..input import InputInterrupt, AbstractInputter
 from ..renderer import AbstractRenderer
 
 
-def create_inputter(inputs=["mock input 1"]) -> Callable[[], str]:
-    queue = deque(inputs)
+class MockInputter(AbstractInputter):
+    def __init__(self, inputs=["mock input 1"]) -> None:
+        self.queue = deque(inputs)
 
-    def get_input() -> str:
-        if len(queue) == 0:
+    def get_input(self) -> str:
+        if len(self.queue) == 0:
             raise InputInterrupt()
 
-        return queue.popleft()
-
-    return get_input
+        return self.queue.popleft()
 
 
 def parse_args():
@@ -22,6 +20,7 @@ def parse_args():
         dry=False,
         inputs=[],
         line_target=0,
+        transcribe_loop_sleep=0.5,
         no_markdown=True,
         no_transcribe=True,
         template=None,
