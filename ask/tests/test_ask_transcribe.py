@@ -15,7 +15,7 @@ def create_parse_args_with_transcribe_filename(transcribe_filename):
             dry=False,
             inputs=[],
             line_target=0,
-            transcribe_loop_sleep=0.01,
+            transcribe_loop_sleep=0.001,
             no_markdown=True,
             no_transcribe=False,
             transcribe_filename=transcribe_filename,

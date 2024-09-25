@@ -37,10 +37,7 @@ def quit(renderer: AbstractRenderer) -> None:
 signal.signal(signal.SIGINT, signal_handler)
 
 
-default_transcribe_filename = config.get(
-    "transcribe", "filename", fallback="/tmp/transcribe.txt"
-)
-
+default_transcribe_filename = config.transcribe.filename
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Asker")
