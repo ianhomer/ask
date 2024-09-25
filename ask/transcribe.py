@@ -12,7 +12,6 @@ running = False
 # limited value for this chat bot context.
 excludes = [
     r"^\([^\)]+\)$",
-    r"^\[[^\]]+\]$",
     r"^\*[^\*]+\*$",
     r"^all right[\.]?$",
     r"^thank you[\.]?$",
@@ -20,6 +19,12 @@ excludes = [
     r"^yeah[\.]?$",
     r"^\.+$",
     r"^\.$",
+]
+
+remove_filters = [
+    # Stip out content within square brakets, e.g. timestamps like
+    # [00:00:00.000 --> 00:00:02.000]
+    r"\[.*\]",
 ]
 
 
@@ -34,7 +39,7 @@ def is_running():
 
 
 def register_transcribed_text(
-    transcribe_filename, inputter, loop_sleep=0.5
+    transcribe_filename, inputter, loop_sleep=2
 ) -> Optional[threading.Thread]:
     global running
     if os.path.exists(transcribe_filename):
@@ -76,7 +81,11 @@ def transcribe_worker(transcribe_filename, inputter, loop_sleep):
 
 
 def filter_single_line(raw_line) -> Optional[str]:
-    line = raw_line.strip()
+    line = raw_line
+    for pattern in remove_filters:
+        line = re.sub(pattern, "", line)
+
+    line = line.strip()
     for pattern in excludes:
         if re.match(pattern, line, re.IGNORECASE):
             return None

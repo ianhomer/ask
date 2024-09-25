@@ -5,6 +5,10 @@ def test_not_filtered():
     assert transcribe_filter("Hello") == "Hello"
 
 
+def test_filtered_content_in_square_brakets():
+    assert transcribe_filter("[00:00:00.000 --> 00:00:02.000]   Hello") == "Hello"
+
+
 def test_starred_message():
     assert not transcribe_filter("*snap*")
 

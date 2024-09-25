@@ -55,7 +55,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--transcribe-loop-sleep",
         help="Sleep time for transcribe read loop",
-        default=0.5,
+        default=1,
     )
     parser.add_argument(
         "--dry", help="Just output the prompt and then exit", action="store_true"

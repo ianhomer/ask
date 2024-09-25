@@ -64,8 +64,7 @@ For example build [whisper.cpp](https://github.com/ggerganov/whisper.cpp) and ru
     cd whisper.cpp
     bash ./models/download-ggml-model.sh small.en
     make
-    ./stream -m models/ggml-small.en.bin -t 10 --step 2000 --length 2000 --keep 500 \
-              -vth 0.1 -f /tmp/transcribe.txt
+    ./stream -m models/ggml-large-v3-q5_0.bin --length 1000 --keep 0 -f /tmp/transcribe.txt
 
 ## Example
 
