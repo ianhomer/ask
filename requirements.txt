@@ -1,5 +1,6 @@
 configparser
 google-generativeai
+llama-cpp-python
 prompt_toolkit
 pypdf
 pyperclip

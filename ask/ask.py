@@ -1,6 +1,7 @@
 import signal
 import threading
 import sys
+import importlib
 from typing import Optional
 
 
@@ -14,6 +15,7 @@ from .transcribe import register_transcribed_text, stop_transcribe
 from .config import load_config, default_parse_args
 from .gemini import Gemini
 from .ollama import Ollama
+from .llama import LlamaCpp
 from .renderer import RichRenderer, AbstractRenderer
 from .bot_service import BotService
 from .handler import InputHandler
@@ -60,6 +62,8 @@ def run(
 
     if not Service:
         match config.service.provider.lower():
+            case "llamacpp":
+                Service = LlamaCpp
             case "ollama":
                 Service = Ollama
             case _:
