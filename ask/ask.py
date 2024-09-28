@@ -13,6 +13,7 @@ from .prompt import get_prompt
 from .transcribe import register_transcribed_text, stop_transcribe
 from .config import load_config, default_parse_args
 from .gemini import Gemini
+from .anthropic import AnthropicService
 from .ollama import Ollama
 from .renderer import RichRenderer, AbstractRenderer
 from .bot_service import BotService
@@ -62,6 +63,8 @@ def run(
         match config.service.provider.lower():
             case "ollama":
                 Service = Ollama
+            case "anthropic":
+                Service = AnthropicService
             case _:
                 Service = Gemini
     service = Service(renderer=renderer, prompt=prompt, line_target=config.line_target)

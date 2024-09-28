@@ -1,3 +1,4 @@
+anthropic
 configparser
 google-generativeai
 prompt_toolkit
