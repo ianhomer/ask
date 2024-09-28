@@ -12,7 +12,7 @@ class BotService:
         pass
 
     @abstractmethod
-    def process(self, user_input: Optional[str]) -> Optional[str]:
+    def process(self, user_input: str) -> Optional[str]:
         pass
 
     @property
