@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from typing import Optional
 
 from ..renderer import AbstractRenderer
 
@@ -12,7 +11,7 @@ class BotService:
         pass
 
     @abstractmethod
-    def process(self, user_input: str) -> Optional[str]:
+    def process(self, user_input: str) -> str:
         pass
 
     @property

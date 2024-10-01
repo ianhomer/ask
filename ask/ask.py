@@ -99,7 +99,10 @@ def run(
                 quit(renderer)
                 break
             if input_handler_response.process:
-                response_text = process(user_input)
+                try:
+                    response_text = process(user_input)
+                except Exception as e:
+                    print(f"\nCannot process prompt \n{user_input}\n", e)
 
     return renderer
 
