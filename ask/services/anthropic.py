@@ -1,5 +1,4 @@
 import os
-from typing import Optional
 
 from anthropic import Anthropic
 from anthropic.types import TextBlock
@@ -35,22 +34,19 @@ class AnthropicService(BotService):
     def available(self) -> bool:
         return self._available
 
-    def process(self, user_input: str) -> Optional[str]:
-        try:
-            message = self.client.messages.create(
-                max_tokens=4906,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": user_input,
-                    }
-                ],
-                model="claude-3-5-sonnet-20240620",
-            )
-            content = message.content[0]
-            if type(content) is TextBlock:
-                return content.text
-        except Exception as e:
-            print(f"\nCannot process prompt \n{user_input}\n", e)
-
-        return None
+    def process(self, user_input: str) -> str:
+        message = self.client.messages.create(
+            max_tokens=4906,
+            messages=[
+                {
+                    "role": "user",
+                    "content": user_input,
+                }
+            ],
+            model="claude-3-5-sonnet-20240620",
+        )
+        content = message.content[0]
+        if type(content) is TextBlock:
+            return content.text
+        else:
+            return str(content)

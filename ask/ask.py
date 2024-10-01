@@ -1,7 +1,8 @@
+import queue
 import signal
 import sys
 import threading
-from typing import Optional
+from typing import List, Optional
 
 from prompt_toolkit.patch_stdout import patch_stdout
 
@@ -17,6 +18,7 @@ from .services.ollama import Ollama
 from .transcribe import register_transcribed_text, stop_transcribe
 
 transcribe_thread: Optional[threading.Thread] = None
+running = True
 
 
 def signal_handler(sig: int, frame: Optional[object]) -> None:
@@ -24,8 +26,14 @@ def signal_handler(sig: int, frame: Optional[object]) -> None:
     sys.exit(0)
 
 
+user_inputs = queue.Queue()
+
+
 def quit(renderer: AbstractRenderer) -> None:
+    global running
     renderer.print_line("Bye ...")
+    running = False
+    user_inputs.put("")
     if transcribe_thread:
         stop_transcribe()
 
@@ -40,7 +48,7 @@ def run(
     parse_args=default_parse_args,
     config_file_name="~/.config/ask/ask.ini",
 ) -> AbstractRenderer:
-    global transcribe_thread
+    global transcribe_thread, running
 
     config = load_config(parse_args, config_file_name)
 
@@ -66,13 +74,11 @@ def run(
                 Service = Gemini
     service = Service(renderer=renderer, prompt=prompt, line_target=config.line_target)
 
-    def process(user_input) -> Optional[str]:
+    def process(user_input) -> str:
         renderer.print_processing()
         response_text = service.process(user_input)
         renderer.print_response(response_text)
         return response_text
-
-    response_text: Optional[str] = None
 
     if config.transcribe.enabled:
         transcribe_thread = register_transcribed_text(
@@ -80,26 +86,46 @@ def run(
             inputter,
             loop_sleep=config.transcribe.loop_sleep,
         )
+
+    response_history: List[Optional[str]] = [None]
+
     if config.inputs or file_input:
-        response_text = process(
+        response_history[0] = process(
             "answer or do what I just asked. If you have no answer, "
             + "just say the word :'OK'",
         )
 
-    while service.available:
-        try:
-            with patch_stdout():
-                user_input = inputter.get_input()
-        except InputInterrupt:
-            quit(renderer)
-            break
-        if user_input and len(user_input) > 0:
-            input_handler_response = input_handler.handle(user_input, response_text)
-            if input_handler_response.quit:
+    def input_process():
+        global running
+        while running:
+            try:
+                with patch_stdout():
+                    user_input = inputter.get_input()
+            except InputInterrupt:
                 quit(renderer)
                 break
-            if input_handler_response.process:
-                response_text = process(user_input)
+            if user_input and len(user_input) > 0:
+                input_handler_response = input_handler.handle(
+                    user_input,
+                    response_history[0],
+                )
+                if input_handler_response.quit:
+                    quit(renderer)
+                    break
+                user_inputs.put(user_input)
+
+    input_thread = threading.Thread(
+        target=input_process,
+        args=(),
+    )
+    input_thread.start()
+    while running and service.available:
+        user_input = user_inputs.get()
+        if len(user_input) > 0:
+            try:
+                response_history[0] = process(user_input)
+            except Exception as e:
+                print(f"\nCannot process prompt \n{user_input}\n", e)
 
     return renderer
 

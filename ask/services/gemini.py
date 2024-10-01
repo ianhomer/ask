@@ -51,11 +51,6 @@ class Gemini(BotService):
     def available(self) -> bool:
         return self._available
 
-    def process(self, user_input: Optional[str]) -> Optional[str]:
-        try:
-            response = self.chat.send_message(user_input)
-            return response.text
-        except Exception as e:
-            print(f"\nCannot process prompt \n{user_input}\n", e)
-
-        return None
+    def process(self, user_input: Optional[str]) -> str:
+        response = self.chat.send_message(user_input)
+        return response.text

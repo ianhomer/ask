@@ -1,5 +1,3 @@
-from typing import Optional
-
 import requests
 
 from .bot_service import BotService
@@ -10,7 +8,7 @@ class Ollama(BotService):
     def available(self) -> bool:
         return True
 
-    def process(self, user_input: str) -> Optional[str]:
+    def process(self, user_input: str) -> str:
         response = requests.post(
             "http://localhost:11434/api/generate",
             json={
