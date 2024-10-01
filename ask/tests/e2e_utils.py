@@ -1,5 +1,6 @@
 import argparse
 from collections import deque
+from typing import List
 
 from ..config import create_parser
 from ..prompter import AbstractPrompter, InputInterrupt
@@ -25,6 +26,7 @@ def mock_parse_args():
         line_target=0,
         no_markdown=True,
         no_transcribe=True,
+        one=False,
         provider="mock",
         template=None,
         transcribe_filename="/tmp/transcribe.txt",
@@ -32,8 +34,16 @@ def mock_parse_args():
     )
 
 
-def parse_args_for_tests():
-    return create_parser().parse_args(["--no-markdown", "--provider=mock"])
+def generate_args(args: List[str]):
+    return lambda: create_parser().parse_args(args)
+
+
+def empty_args():
+    return generate_args([])()
+
+
+def default_parse_args_for_tests():
+    return generate_args(["--no-markdown", "--provider=mock"])()
 
 
 class CapturingRenderer(AbstractRenderer):

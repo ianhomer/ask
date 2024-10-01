@@ -1,5 +1,7 @@
 from typing import Optional
 
+from ask.pipelines.one_shot import OneShot
+
 from .config import default_parse_args, load_config
 from .pipelines.prompt_loop import PromptLoop
 from .prompt_generator import generate_prompt
@@ -53,13 +55,17 @@ def run(
                 Service = Gemini
     service = Service(renderer=renderer, prompt=prompt, line_target=config.line_target)
 
-    PromptLoop(
-        has_initial_prompt=len(config.inputs) > 0 or file_input,
-        renderer=renderer,
-        quitter=quitter,
-        service=service,
-        inputter=prompter,
-    ).run()
+    if config.pipeline == "one-shot":
+        OneShot(service=service).run()
+        quitter.quit(quiet=True)
+    else:
+        PromptLoop(
+            has_initial_prompt=len(config.inputs) > 0 or file_input,
+            renderer=renderer,
+            quitter=quitter,
+            service=service,
+            inputter=prompter,
+        ).run()
 
     return renderer
 

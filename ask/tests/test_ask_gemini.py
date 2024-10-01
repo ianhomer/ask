@@ -3,7 +3,12 @@ from io import StringIO
 from unittest.mock import patch
 
 from ..ask import run
-from .e2e_utils import CapturingRenderer, MockInputter, mock_parse_args
+from .e2e_utils import (
+    CapturingRenderer,
+    MockInputter,
+    default_parse_args_for_tests,
+    mock_parse_args,
+)
 
 
 @patch("google.generativeai.GenerativeModel")
@@ -14,7 +19,7 @@ def test_ask_gemini_key_required(GenerativeModel):
     renderer = run(
         prompter=MockInputter(),
         Renderer=CapturingRenderer,
-        parse_args=mock_parse_args,
+        parse_args=default_parse_args_for_tests,
     )
     assert "set in the environment variable GEMINI_API_KEY" in renderer.messages[0]
     lines = [line for line in renderer.body.split("\n") if line]
@@ -28,7 +33,7 @@ def test_ask_gemini(GenerativeModel):
     mock.start_chat().send_message().text = "mock-response"
 
     with patch("sys.stdout", new=StringIO()) as captured_output:
-        run(prompter=MockInputter(), parse_args=mock_parse_args)
+        run(prompter=MockInputter(), parse_args=default_parse_args_for_tests)
         lines = [line for line in captured_output.getvalue().split("\n") if line]
         assert lines[0] == "   -) ...                                     ..."
         assert lines[1] == "mock-response"
@@ -73,7 +78,7 @@ def test_ask_gemini_empty_inputs(GenerativeModel):
     renderer = run(
         prompter=MockInputter(inputs=["mock input 1", "", "", ""]),
         Renderer=CapturingRenderer,
-        parse_args=mock_parse_args,
+        parse_args=default_parse_args_for_tests,
     )
     lines = [line for line in renderer.body.split("\n") if line]
     assert lines[0] == "..."

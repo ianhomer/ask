@@ -15,6 +15,11 @@ def create_parser():
     parser = argparse.ArgumentParser(description="Asker")
 
     parser.add_argument("inputs", help="Input content", nargs="*")
+    parser.add_argument(
+        "--one",
+        help="Ask a single question expecting a single response",
+        action="store_true",
+    )
     parser.add_argument("--debug", help="Debug logging", action="store_true")
     parser.add_argument("--template", help="Input template")
     parser.add_argument("--provider", help="Service provider", default="Gemini")
@@ -75,7 +80,7 @@ class Config:
 
     @property
     def transcribe(self):
-        return TranscribeConfig(self.config, self.args, "transcribe")
+        return TranscribeConfig(self.config, self.args, "transcribe", self.pipeline)
 
     @property
     def markdown(self) -> bool:
@@ -90,6 +95,18 @@ class Config:
     @property
     def debug_enabled(self) -> bool:
         return self.config.get("DEFAULT", "debug", fallback=self.args.debug)
+
+    @property
+    def pipeline(self) -> str:
+        pipeline = self.config.get("DEFAULT", "pipeline", fallback=None)
+
+        if pipeline:
+            return pipeline
+
+        if self.args.one:
+            return "one-shot"
+        else:
+            return "prompt-loop"
 
     @property
     def inputs(self) -> list[str]:
@@ -122,10 +139,11 @@ class ServiceConfig:
 
 
 class TranscribeConfig:
-    def __init__(self, config, args, section_name) -> None:
+    def __init__(self, config, args, section_name, pipeline_name) -> None:
         self.section_name = section_name
         self.config = config
         self.args = args
+        self.pipeline_name = pipeline_name
 
     @property
     def filename(self) -> str:
@@ -145,6 +163,8 @@ class TranscribeConfig:
 
     @property
     def enabled(self) -> bool:
+        if self.pipeline_name == "one-shot":
+            return False
         return self.config.get(
             "DEFAULT", "enabled", fallback=not self.args.no_transcribe
         )

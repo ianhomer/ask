@@ -1,7 +1,10 @@
 [tool.pytest-watcher]
-now = false
+now = true
 delay = 0.2
 runner = "pytest"
 runner_args = []
-patterns = ["*.py"]
+patterns = ["**/*.py","**/*.ini"]
 ignore_patterns = [".null-ls*"]
+
+[tool.isort]
+profile = "black"

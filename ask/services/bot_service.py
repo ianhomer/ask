@@ -10,11 +10,14 @@ class BotService:
     ) -> None:
         self.renderer = renderer
 
-    def process(self, prompt) -> str:
-        self.renderer.print_processing()
+    def process_message(self, prompt) -> str:
         response_text = self.send_message(prompt)
         self.renderer.print_response(response_text)
         return response_text
+
+    def process(self, prompt) -> str:
+        self.renderer.print_processing()
+        return self.process_message(prompt)
 
     @abstractmethod
     def send_message(self, prompt: str) -> str:

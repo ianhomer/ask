@@ -13,8 +13,9 @@ class Quitter:
     def register(self, closer):
         self.closers.append(closer)
 
-    def quit(self):
-        self.renderer.print_line("Bye ...")
+    def quit(self, quiet=False):
+        if not quiet:
+            self.renderer.print_line("Bye ...")
         for closer in self.closers:
             closer()
 
