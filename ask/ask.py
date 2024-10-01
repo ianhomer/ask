@@ -2,6 +2,7 @@ import queue
 import signal
 import sys
 import threading
+from queue import Queue
 from typing import List, Optional
 
 from prompt_toolkit.patch_stdout import patch_stdout
@@ -26,7 +27,7 @@ def signal_handler(sig: int, frame: Optional[object]) -> None:
     sys.exit(0)
 
 
-user_inputs = queue.Queue()
+user_inputs: Queue[str] = queue.Queue()
 
 
 def quit(renderer: AbstractRenderer) -> None:
