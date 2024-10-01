@@ -18,10 +18,6 @@ class AbstractRenderer:
     def print(self, message):
         pass
 
-    @abstractmethod
-    def print_carriage_return(self):
-        pass
-
     def print_line(self, message):
         self.print(message)
         self.print("\n")
