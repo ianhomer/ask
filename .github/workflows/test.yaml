@@ -15,11 +15,16 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: install ask
         run: pip install -e .
-      - name: install python dependencies
+      - name: install dev dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest
+          pip install -r requirements-dev.txt
+
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
+      - name: lint check with flake8
+        run: flake8 . --max-line-length=88
+      - name: lint check with black
+        run: black --check .
       - name: Test
         run: pytest
