@@ -48,7 +48,9 @@ class PromptInputter(AbstractInputter):
     def get_input(self) -> str:
         try:
             return (
-                self.prompt_session.prompt(prompt_fragments, style=style).strip()
+                self.prompt_session.prompt(
+                    prompt_fragments, style=style, vi_mode=True
+                ).strip()
                 + self.get_more_input_with_wait()
             )
         except KeyboardInterrupt as e:
