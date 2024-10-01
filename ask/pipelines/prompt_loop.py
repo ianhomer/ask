@@ -18,13 +18,13 @@ class PromptLoop(Pipeline):
         renderer: AbstractRenderer,
         service: BotService,
         quitter: Quitter,
-        inputter: AbstractPrompter,
+        prompter: AbstractPrompter,
     ) -> None:
         self.has_initial_prompt = has_initial_prompt
         self.renderer = renderer
         self.service = service
         self.quitter = quitter
-        self.inputter = inputter
+        self.prompter = prompter
         pass
 
     def run(self) -> None:
@@ -42,7 +42,7 @@ class PromptLoop(Pipeline):
         while self.service.available:
             try:
                 with patch_stdout():
-                    prompt = self.inputter.get_input()
+                    prompt = self.prompter.get_input()
             except InputInterrupt:
                 self.quitter.quit()
                 break

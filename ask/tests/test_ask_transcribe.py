@@ -5,7 +5,7 @@ from typing import Optional
 from ..ask import run
 from ..services.bot_service import BotService
 from .e2e_utils import CapturingRenderer
-from .transcribe_prompt_inputter import TranscribePromptInputter
+from .transcribe_prompter import TranscribePrompter
 
 TESTS_DIRECTORY = os.path.dirname(__file__)
 
@@ -41,7 +41,7 @@ def test_ask_transcribe(tmp_path):
     transcribe_filename = tmp_path / "transcribe.txt"
 
     renderer = run(
-        prompter=TranscribePromptInputter(transcribe_filename),
+        prompter=TranscribePrompter(transcribe_filename),
         Service=MockBotService,
         Renderer=CapturingRenderer,
         parse_args=create_parse_args_with_transcribe_filename(transcribe_filename),

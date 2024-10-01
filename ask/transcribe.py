@@ -43,13 +43,13 @@ def is_running():
 
 
 def register_transcribed_text(
-    transcribe_filename, inputter, loop_sleep: float = 2
+    transcribe_filename, prompter, loop_sleep: float = 2
 ) -> Callable[[], None]:
     global running
     if os.path.exists(transcribe_filename):
         transcribe_thread = threading.Thread(
             target=transcribe_worker,
-            args=(transcribe_filename, inputter, loop_sleep),
+            args=(transcribe_filename, prompter, loop_sleep),
         )
         if is_debug():
             print("... starting transcribe thread")
@@ -57,7 +57,7 @@ def register_transcribed_text(
     return stop_transcribe
 
 
-def transcribe_worker(transcribe_filename, inputter, loop_sleep):
+def transcribe_worker(transcribe_filename, prompter, loop_sleep):
     global running
     last_line = None
     if os.path.exists(transcribe_filename):
@@ -67,19 +67,19 @@ def transcribe_worker(transcribe_filename, inputter, loop_sleep):
             loops_before_submit = 0
             line_inserted = False
             while running:
-                if inputter.is_running():
+                if prompter.is_running():
                     chunk = transcribe_filter(file.read())
                     if chunk:
                         for line in chunk.split("\n"):
                             if line != last_line:
                                 line_inserted = True
                                 loops_before_submit = 4
-                                inputter.write(" " + line)
+                                prompter.write(" " + line)
                                 last_line = line
                     if line_inserted:
                         if loops_before_submit < 1:
-                            if inputter.has_text():
-                                inputter.flush()
+                            if prompter.has_text():
+                                prompter.flush()
                                 line_inserted = False
                         else:
                             loops_before_submit -= 1

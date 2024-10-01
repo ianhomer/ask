@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from ..ask import run
 from ..services.bot_service import BotService
-from .e2e_utils import MockInputter, mock_parse_args
+from .e2e_utils import MockPrompter, mock_parse_args
 
 
 class MockBotService(BotService):
@@ -19,7 +19,7 @@ class MockBotService(BotService):
 def test_ask_run():
     with patch("sys.stdout", new=StringIO()) as captured_output:
         run(
-            prompter=MockInputter(),
+            prompter=MockPrompter(),
             Service=MockBotService,
             parse_args=mock_parse_args,
         )

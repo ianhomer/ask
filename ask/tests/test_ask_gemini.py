@@ -5,7 +5,7 @@ from unittest.mock import patch
 from ..ask import run
 from .e2e_utils import (
     CapturingRenderer,
-    MockInputter,
+    MockPrompter,
     default_parse_args_for_tests,
     mock_parse_args,
 )
@@ -17,7 +17,7 @@ def test_ask_gemini_key_required(GenerativeModel):
     mock.start_chat().send_message().text = "mock-response"
 
     renderer = run(
-        prompter=MockInputter(),
+        prompter=MockPrompter(),
         Renderer=CapturingRenderer,
         parse_args=default_parse_args_for_tests,
     )
@@ -33,7 +33,7 @@ def test_ask_gemini(GenerativeModel):
     mock.start_chat().send_message().text = "mock-response"
 
     with patch("sys.stdout", new=StringIO()) as captured_output:
-        run(prompter=MockInputter(), parse_args=default_parse_args_for_tests)
+        run(prompter=MockPrompter(), parse_args=default_parse_args_for_tests)
         lines = [line for line in captured_output.getvalue().split("\n") if line]
         assert lines[0] == "   -) ...                                     ..."
         assert lines[1] == "mock-response"
@@ -55,7 +55,7 @@ const a = 1
 """
 
     renderer = run(
-        prompter=MockInputter(inputs=["mock input 1", "copy code"]),
+        prompter=MockPrompter(inputs=["mock input 1", "copy code"]),
         Renderer=CapturingRenderer,
         parse_args=mock_parse_args,
     )
@@ -76,7 +76,7 @@ def test_ask_gemini_empty_inputs(GenerativeModel):
     mock = GenerativeModel()
     mock.start_chat().send_message().text = "mock-response"
     renderer = run(
-        prompter=MockInputter(inputs=["mock input 1", "", "", ""]),
+        prompter=MockPrompter(inputs=["mock input 1", "", "", ""]),
         Renderer=CapturingRenderer,
         parse_args=default_parse_args_for_tests,
     )

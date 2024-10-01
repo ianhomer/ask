@@ -64,7 +64,7 @@ def run(
             renderer=renderer,
             quitter=quitter,
             service=service,
-            inputter=prompter,
+            prompter=prompter,
         ).run()
 
     return renderer

@@ -7,13 +7,13 @@ from ..prompter import AbstractPrompter, InputInterrupt
 from ..transcribe import is_running
 
 
-class TranscribePromptInputter(AbstractPrompter):
+class TranscribePrompter(AbstractPrompter):
     def __init__(
         self,
         transcribe_filename,
         inputs=["mock input 1", "<transcribed>input 2", "mock input 3"],
     ) -> None:
-        self.prompt_session = PromptSession()
+        self.prompt_session: PromptSession = PromptSession()
         self.transcribe_filename = transcribe_filename
         self.queue = deque(inputs)
 
