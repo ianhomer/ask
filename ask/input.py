@@ -39,7 +39,9 @@ class AbstractInputter:
 
 class PromptInputter(AbstractInputter):
     def __init__(self) -> None:
-        self.prompt_session = PromptSession()
+        self.prompt_session: PromptSession = PromptSession(
+            prompt_fragments, style=style, vi_mode=True
+        )
 
     @property
     def current_buffer(self):
@@ -48,8 +50,7 @@ class PromptInputter(AbstractInputter):
     def get_input(self) -> str:
         try:
             return (
-                self.prompt_session.prompt(prompt_fragments, style=style).strip()
-                + self.get_more_input_with_wait()
+                self.prompt_session.prompt().strip() + self.get_more_input_with_wait()
             )
         except KeyboardInterrupt as e:
             raise InputInterrupt(e)
