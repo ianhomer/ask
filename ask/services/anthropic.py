@@ -11,7 +11,7 @@ ANTHROPIC_API_KEY_NAME = "ANTHROPIC_API_KEY"
 
 class AnthropicService(BotService):
     def __init__(self, prompt, renderer: AbstractRenderer, line_target=0) -> None:
-        self.renderer = renderer
+        super().__init__(prompt, renderer, line_target)
         if ANTHROPIC_API_KEY_NAME not in os.environ:
             self.renderer.print(
                 f"""
@@ -34,13 +34,13 @@ class AnthropicService(BotService):
     def available(self) -> bool:
         return self._available
 
-    def process(self, user_input: str) -> str:
+    def send_message(self, prompt: str) -> str:
         message = self.client.messages.create(
             max_tokens=4906,
             messages=[
                 {
                     "role": "user",
-                    "content": user_input,
+                    "content": prompt,
                 }
             ],
             model="claude-3-5-sonnet-20240620",

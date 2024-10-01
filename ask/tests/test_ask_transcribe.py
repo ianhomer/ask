@@ -27,10 +27,10 @@ def create_parse_args_with_transcribe_filename(transcribe_filename):
 
 
 class MockBotService(BotService):
-    def process(
-        self, user_input, previous_response_text: Optional[str] = None
+    def send_message(
+        self, prompt, previous_response_text: Optional[str] = None
     ) -> Optional[str]:
-        return "OK:" + user_input
+        return "OK:" + prompt
 
     @property
     def available(self):

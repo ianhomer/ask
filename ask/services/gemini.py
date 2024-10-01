@@ -1,6 +1,5 @@
 import os
 from collections.abc import Iterable
-from typing import Optional
 
 import google.generativeai as genai
 from google.generativeai.types import content_types
@@ -12,8 +11,8 @@ API_KEY_NAME = "GEMINI_API_KEY"
 
 
 class Gemini(BotService):
-    def __init__(self, prompt, renderer: AbstractRenderer, line_target=0) -> None:
-        self.renderer = renderer
+    def __init__(self, prompt, renderer: AbstractRenderer, line_target) -> None:
+        super().__init__(prompt, renderer, line_target)
         if API_KEY_NAME not in os.environ:
             self.renderer.print(
                 f"""
@@ -51,6 +50,6 @@ class Gemini(BotService):
     def available(self) -> bool:
         return self._available
 
-    def process(self, user_input: Optional[str]) -> str:
-        response = self.chat.send_message(user_input)
+    def send_message(self, prompt: str) -> str:
+        response = self.chat.send_message(prompt)
         return response.text

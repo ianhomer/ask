@@ -8,9 +8,7 @@ from .e2e_utils import MockInputter, mock_parse_args
 
 
 class MockBotService(BotService):
-    def process(
-        self, user_input, previous_response_text: Optional[str] = None
-    ) -> Optional[str]:
+    def send_message(self, prompt, previous_response_text: Optional[str] = None) -> str:
         return "OK"
 
     @property

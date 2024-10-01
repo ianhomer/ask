@@ -6,12 +6,18 @@ from ..renderer import AbstractRenderer
 class BotService:
     @abstractmethod
     def __init__(
-        self, prompt: str, line_target: int, renderer: AbstractRenderer
+        self, prompt: str, renderer: AbstractRenderer, line_target: int
     ) -> None:
-        pass
+        self.renderer = renderer
+
+    def process(self, prompt) -> str:
+        self.renderer.print_processing()
+        response_text = self.send_message(prompt)
+        self.renderer.print_response(response_text)
+        return response_text
 
     @abstractmethod
-    def process(self, user_input: str) -> str:
+    def send_message(self, prompt: str) -> str:
         pass
 
     @property

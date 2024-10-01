@@ -10,7 +10,7 @@ Run tests
 
 Run tests with pytest watcher
 
-    ptw
+    ptw .
 
 Install git hook scripts
 

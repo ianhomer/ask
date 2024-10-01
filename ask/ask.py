@@ -41,7 +41,7 @@ def run(
     config = load_config(parse_args, config_file_name)
 
     renderer = Renderer(pretty_markdown=config.markdown)
-    input_handler = PromptPreProcessor(renderer=renderer)
+    prompt_pre_processor = PromptPreProcessor(renderer=renderer)
 
     file_input = False
 
@@ -62,12 +62,6 @@ def run(
                 Service = Gemini
     service = Service(renderer=renderer, prompt=prompt, line_target=config.line_target)
 
-    def process(user_input) -> Optional[str]:
-        renderer.print_processing()
-        response_text = service.process(user_input)
-        renderer.print_response(response_text)
-        return response_text
-
     response_text: Optional[str] = None
 
     if config.transcribe.enabled:
@@ -77,7 +71,7 @@ def run(
             loop_sleep=config.transcribe.loop_sleep,
         )
     if config.inputs or file_input:
-        response_text = process(
+        response_text = service.send_message(
             "answer or do what I just asked. If you have no answer, "
             + "just say the word :'OK'",
         )
@@ -85,20 +79,20 @@ def run(
     while service.available:
         try:
             with patch_stdout():
-                user_input = inputter.get_input()
+                prompt = inputter.get_input()
         except InputInterrupt:
             quit(renderer)
             break
-        if user_input and len(user_input) > 0:
-            input_handler_response = input_handler.handle(user_input, response_text)
+        if prompt and len(prompt) > 0:
+            input_handler_response = prompt_pre_processor.handle(prompt, response_text)
             if input_handler_response.quit:
                 quit(renderer)
                 break
             if input_handler_response.process:
                 try:
-                    response_text = process(user_input)
+                    response_text = service.process(prompt)
                 except Exception as e:
-                    print(f"\nCannot process prompt \n{user_input}\n", e)
+                    print(f"\nCannot process prompt \n{prompt}\n", e)
 
     return renderer
 
