@@ -1,23 +1,22 @@
 import signal
-import threading
 import sys
+import threading
 from typing import Optional
 
-
+from .config import default_parse_args, load_config
+from .handler import InputHandler
 from .input import (
     AbstractInputter,
     InputInterrupt,
     PromptInputter,
 )
 from .prompt import get_prompt
+from .renderer import AbstractRenderer, RichRenderer
+from .services.anthropic import AnthropicService
+from .services.bot_service import BotService
+from .services.gemini import Gemini
+from .services.ollama import Ollama
 from .transcribe import register_transcribed_text, stop_transcribe
-from .config import load_config, default_parse_args
-from .gemini import Gemini
-from .anthropic import AnthropicService
-from .ollama import Ollama
-from .renderer import RichRenderer, AbstractRenderer
-from .bot_service import BotService
-from .handler import InputHandler
 
 transcribe_thread: Optional[threading.Thread] = None
 
@@ -41,7 +40,7 @@ def run(
     Service: Optional[type[BotService]] = None,
     Renderer: type[AbstractRenderer] = RichRenderer,
     parse_args=default_parse_args,
-    config_file_name="~/.config/ask/ask.ini"
+    config_file_name="~/.config/ask/ask.ini",
 ) -> AbstractRenderer:
     global transcribe_thread
 

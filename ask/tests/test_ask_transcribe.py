@@ -1,13 +1,11 @@
-from typing import Optional
-
-from ask.tests.transcribe_prompt_inputter import TranscribePromptInputter
 import argparse
 import os
-
-from ask.bot_service import BotService
+from typing import Optional
 
 from ..ask import run
+from ..services.bot_service import BotService
 from .e2e_utils import CapturingRenderer
+from .transcribe_prompt_inputter import TranscribePromptInputter
 
 TESTS_DIRECTORY = os.path.dirname(__file__)
 
@@ -47,7 +45,7 @@ def test_ask_transcribe(tmp_path):
         Service=MockBotService,
         Renderer=CapturingRenderer,
         parse_args=create_parse_args_with_transcribe_filename(transcribe_filename),
-        config_file_name=f"{TESTS_DIRECTORY}/config/empty.ini"
+        config_file_name=f"{TESTS_DIRECTORY}/config/empty.ini",
     )
     assert renderer.messages[0] == "..."
     assert renderer.messages[1] == "OK:mock input 1"

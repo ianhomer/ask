@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Optional
 
-from .renderer import AbstractRenderer
+from ..renderer import AbstractRenderer
 
 
 class BotService:

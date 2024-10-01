@@ -4,7 +4,7 @@ import google.generativeai as genai
 from google.generativeai.types import content_types
 from typing import Optional
 
-from .renderer import AbstractRenderer
+from ..renderer import AbstractRenderer
 from .bot_service import BotService
 
 

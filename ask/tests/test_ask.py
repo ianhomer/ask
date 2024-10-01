@@ -2,9 +2,8 @@ from io import StringIO
 from typing import Optional
 from unittest.mock import patch
 
-from ask.bot_service import BotService
-
 from ..ask import run
+from ..services.bot_service import BotService
 from .e2e_utils import MockInputter, mock_parse_args
 
 

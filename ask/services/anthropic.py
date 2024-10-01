@@ -4,7 +4,7 @@ from typing import Optional
 
 from anthropic.types import TextBlock
 from .bot_service import BotService
-from .renderer import AbstractRenderer
+from ..renderer import AbstractRenderer
 
 ANTHROPIC_API_KEY_NAME = "ANTHROPIC_API_KEY"
 
