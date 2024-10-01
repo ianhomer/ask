@@ -1,11 +1,9 @@
 from typing import Optional
 
-from prompt_toolkit.patch_stdout import patch_stdout
-
 from .config import default_parse_args, load_config
-from .pre_processor import PromptPreProcessor
+from .pipelines.prompt_loop import PromptLoop
 from .prompt_generator import generate_prompt
-from .prompter import AbstractPrompter, InputInterrupt, UserPrompter
+from .prompter import AbstractPrompter, UserPrompter
 from .quitter import Quitter
 from .renderer import AbstractRenderer, RichRenderer
 from .services.anthropic import AnthropicService
@@ -16,20 +14,27 @@ from .transcribe import register_transcribed_text
 
 
 def run(
-    inputter: AbstractPrompter = UserPrompter(),
+    prompter: AbstractPrompter = UserPrompter(),
     Service: Optional[type[BotService]] = None,
     Renderer: type[AbstractRenderer] = RichRenderer,
     parse_args=default_parse_args,
     config_file_name="~/.config/ask/ask.ini",
 ) -> AbstractRenderer:
+    file_input = False
 
     config = load_config(parse_args, config_file_name)
 
     renderer = Renderer(pretty_markdown=config.markdown)
     quitter = Quitter(renderer)
-    prompt_pre_processor = PromptPreProcessor(renderer=renderer)
 
-    file_input = False
+    if config.transcribe.enabled:
+        quitter.register(
+            register_transcribed_text(
+                config.transcribe.filename,
+                prompter,
+                loop_sleep=config.transcribe.loop_sleep,
+            )
+        )
 
     prompt, file_input = generate_prompt(config.inputs, config.template)
 
@@ -48,39 +53,13 @@ def run(
                 Service = Gemini
     service = Service(renderer=renderer, prompt=prompt, line_target=config.line_target)
 
-    response_text: Optional[str] = None
-
-    if config.transcribe.enabled:
-        quitter.register(
-            register_transcribed_text(
-                config.transcribe.filename,
-                inputter,
-                loop_sleep=config.transcribe.loop_sleep,
-            )
-        )
-    if config.inputs or file_input:
-        response_text = service.send_message(
-            "answer or do what I just asked. If you have no answer, "
-            + "just say the word :'OK'",
-        )
-
-    while service.available:
-        try:
-            with patch_stdout():
-                prompt = inputter.get_input()
-        except InputInterrupt:
-            quitter.quit()
-            break
-        if prompt and len(prompt) > 0:
-            input_handler_response = prompt_pre_processor.handle(prompt, response_text)
-            if input_handler_response.quit:
-                quitter.quit()
-                break
-            if input_handler_response.process:
-                try:
-                    response_text = service.process(prompt)
-                except Exception as e:
-                    print(f"\nCannot process prompt \n{prompt}\n", e)
+    PromptLoop(
+        has_initial_prompt=len(config.inputs) > 0 or file_input,
+        renderer=renderer,
+        quitter=quitter,
+        service=service,
+        inputter=prompter,
+    ).run()
 
     return renderer
 

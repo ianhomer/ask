@@ -40,7 +40,7 @@ def test_ask_transcribe(tmp_path):
     transcribe_filename = tmp_path / "transcribe.txt"
 
     renderer = run(
-        inputter=TranscribePromptInputter(transcribe_filename),
+        prompter=TranscribePromptInputter(transcribe_filename),
         Service=MockBotService,
         Renderer=CapturingRenderer,
         parse_args=create_parse_args_with_transcribe_filename(transcribe_filename),

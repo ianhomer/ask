@@ -19,7 +19,7 @@ class MockBotService(BotService):
 def test_ask_run():
     with patch("sys.stdout", new=StringIO()) as captured_output:
         run(
-            inputter=MockInputter(),
+            prompter=MockInputter(),
             Service=MockBotService,
             parse_args=mock_parse_args,
         )
