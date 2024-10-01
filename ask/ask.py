@@ -3,6 +3,8 @@ import sys
 import threading
 from typing import Optional
 
+from prompt_toolkit.patch_stdout import patch_stdout
+
 from .config import default_parse_args, load_config
 from .handler import InputHandler
 from .input import AbstractInputter, InputInterrupt, PromptInputter
@@ -86,7 +88,8 @@ def run(
 
     while service.available:
         try:
-            user_input = inputter.get_input()
+            with patch_stdout():
+                user_input = inputter.get_input()
         except InputInterrupt:
             quit(renderer)
             break
