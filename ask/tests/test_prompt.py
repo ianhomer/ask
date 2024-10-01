@@ -1,5 +1,6 @@
-from ..prompt import get_prompt
 import os
+
+from ..prompt import get_prompt
 
 TESTS_DIRECTORY = os.path.dirname(__file__)
 
@@ -11,12 +12,18 @@ def test_get_prompt_with_words():
 
 def test_get_prompt_with_text_file():
     inputs = [f"{TESTS_DIRECTORY}/test.md"]
-    assert get_prompt(inputs, None) == ("# Test\n\nThis is a test file\n", True)
+    assert get_prompt(inputs, None) == (
+        "# Test\n\nThis is a test file\n",
+        True,
+    )
 
 
 def test_get_prompt_with_pdf_file():
     inputs = [f"{TESTS_DIRECTORY}/test.pdf"]
-    assert get_prompt(inputs, None) == ("test\n Test\nThis is a test ﬁle", True)
+    assert get_prompt(inputs, None) == (
+        "test\n Test\nThis is a test ﬁle",
+        True,
+    )
 
 
 def test_get_prompt_with_template():

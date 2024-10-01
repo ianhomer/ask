@@ -1,10 +1,9 @@
+import os
 from io import StringIO
 from unittest.mock import patch
-import os
-
 
 from ..ask import run
-from .e2e_utils import MockInputter, mock_parse_args, CapturingRenderer
+from .e2e_utils import CapturingRenderer, MockInputter, mock_parse_args
 
 
 @patch("google.generativeai.GenerativeModel")
@@ -13,7 +12,9 @@ def test_ask_gemini_key_required(GenerativeModel):
     mock.start_chat().send_message().text = "mock-response"
 
     renderer = run(
-        inputter=MockInputter(), Renderer=CapturingRenderer, parse_args=mock_parse_args
+        inputter=MockInputter(),
+        Renderer=CapturingRenderer,
+        parse_args=mock_parse_args,
     )
     assert "set in the environment variable GEMINI_API_KEY" in renderer.messages[0]
     lines = [line for line in renderer.body.split("\n") if line]

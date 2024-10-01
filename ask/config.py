@@ -1,6 +1,6 @@
+import argparse
 import configparser
 import os
-import argparse
 
 empty_config = configparser.ConfigParser()
 
@@ -22,11 +22,15 @@ def default_parse_args() -> argparse.Namespace:
         default=1,
     )
     parser.add_argument(
-        "--dry", help="Just output the prompt and then exit", action="store_true"
+        "--dry",
+        help="Just output the prompt and then exit",
+        action="store_true",
     )
     parser.add_argument("--line-target", help="Line target for output", default=0)
     parser.add_argument(
-        "--no-transcribe", help="Disable transcribe reading", action="store_true"
+        "--no-transcribe",
+        help="Disable transcribe reading",
+        action="store_true",
     )
     parser.add_argument(
         "--no-markdown",
@@ -109,13 +113,17 @@ class TranscribeConfig:
     @property
     def filename(self) -> str:
         return self.config.get(
-            self.section_name, "filename", fallback=self.args.transcribe_filename
+            self.section_name,
+            "filename",
+            fallback=self.args.transcribe_filename,
         )
 
     @property
     def loop_sleep(self) -> float:
         return self.config.get(
-            self.section_name, "loop_sleep", fallback=self.args.transcribe_loop_sleep
+            self.section_name,
+            "loop_sleep",
+            fallback=self.args.transcribe_loop_sleep,
         )
 
     @property

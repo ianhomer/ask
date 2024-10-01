@@ -1,6 +1,7 @@
 import argparse
 from collections import deque
-from ..input import InputInterrupt, AbstractInputter
+
+from ..input import AbstractInputter, InputInterrupt
 from ..renderer import AbstractRenderer
 
 

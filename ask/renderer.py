@@ -1,6 +1,7 @@
 from abc import abstractmethod
+from typing import List, Optional
+
 from rich import print
-from typing import Optional, List
 from rich.markdown import Markdown
 
 
@@ -52,7 +53,8 @@ class RichRenderer(AbstractRenderer):
 
     def print_processing(self):
         self.print_line(
-            "[bold bright_yellow]   -) ...                                     ...[/bold bright_yellow]"
+            "[bold bright_yellow]   -) ..."
+            + "                                     ...[/bold bright_yellow]"
         )
 
     def print_message(self, message: str):

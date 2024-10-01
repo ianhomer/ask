@@ -1,6 +1,7 @@
-from .renderer import AbstractRenderer
-from .parse import parse_markdown_for_code_blocks
 import pyperclip
+
+from .parse import parse_markdown_for_code_blocks
+from .renderer import AbstractRenderer
 
 
 def copy_code(renderer: AbstractRenderer, response_text: str) -> None:

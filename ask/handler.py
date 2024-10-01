@@ -1,8 +1,8 @@
-from .renderer import AbstractRenderer
 from typing import Optional
 
-from .save import save
 from .copy import copy_code
+from .renderer import AbstractRenderer
+from .save import save
 
 
 class InputHandlerResponse:
@@ -38,7 +38,6 @@ class InputHandler:
         if input_lower == "save":
             save(previous_response_text)
             return InputHandlerResponse(process=False)
-
 
         if previous_response_text and (
             ("copy code" in input_lower and len(input) < 17)

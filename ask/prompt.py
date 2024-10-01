@@ -1,7 +1,8 @@
-from pypdf import PdfReader
 import os
 from pathlib import Path
 from typing import List, Optional, Tuple
+
+from pypdf import PdfReader
 
 ASK_PROMPT_DIRECTORY_NAME = "ASK_PROMPT_DIRECTORY"
 
@@ -28,7 +29,8 @@ def get_prompt(inputs: List[str], template: Optional[str]) -> Tuple[str, bool]:
         else:
             if ASK_PROMPT_DIRECTORY_NAME not in os.environ:
                 raise Exception(
-                    f"Please set {ASK_PROMPT_DIRECTORY_NAME} to use logical prompt names"
+                    f"Please set {ASK_PROMPT_DIRECTORY_NAME} "
+                    + "to use logical prompt names"
                 )
             prompt_directory = os.environ[ASK_PROMPT_DIRECTORY_NAME]
             prompt_file_name = f"{prompt_directory}/{template}.txt"

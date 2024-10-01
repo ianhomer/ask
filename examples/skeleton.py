@@ -1,5 +1,6 @@
-import google.generativeai as genai
 import os
+
+import google.generativeai as genai
 
 
 def main():

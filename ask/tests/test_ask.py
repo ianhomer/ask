@@ -20,7 +20,11 @@ class MockBotService(BotService):
 
 def test_ask_run():
     with patch("sys.stdout", new=StringIO()) as captured_output:
-        run(inputter=MockInputter(), Service=MockBotService, parse_args=mock_parse_args)
+        run(
+            inputter=MockInputter(),
+            Service=MockBotService,
+            parse_args=mock_parse_args,
+        )
         lines = [line for line in captured_output.getvalue().split("\n") if line]
         assert lines[0] == "   -) ...                                     ..."
         assert lines[1] == "OK"

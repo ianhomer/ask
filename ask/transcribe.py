@@ -1,9 +1,8 @@
 import os
-import time
-import threading
-from typing import Optional
 import re
-from typing import List
+import threading
+import time
+from typing import List, Optional
 
 running = False
 
@@ -44,7 +43,8 @@ def register_transcribed_text(
     global running
     if os.path.exists(transcribe_filename):
         transcribe_thread = threading.Thread(
-            target=transcribe_worker, args=(transcribe_filename, inputter, loop_sleep)
+            target=transcribe_worker,
+            args=(transcribe_filename, inputter, loop_sleep),
         )
         transcribe_thread.start()
         return transcribe_thread

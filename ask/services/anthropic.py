@@ -1,10 +1,11 @@
 import os
-from anthropic import Anthropic
 from typing import Optional
 
+from anthropic import Anthropic
 from anthropic.types import TextBlock
-from .bot_service import BotService
+
 from ..renderer import AbstractRenderer
+from .bot_service import BotService
 
 ANTHROPIC_API_KEY_NAME = "ANTHROPIC_API_KEY"
 

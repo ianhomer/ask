@@ -5,11 +5,7 @@ from typing import Optional
 
 from .config import default_parse_args, load_config
 from .handler import InputHandler
-from .input import (
-    AbstractInputter,
-    InputInterrupt,
-    PromptInputter,
-)
+from .input import AbstractInputter, InputInterrupt, PromptInputter
 from .prompt import get_prompt
 from .renderer import AbstractRenderer, RichRenderer
 from .services.anthropic import AnthropicService

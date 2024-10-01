@@ -1,6 +1,6 @@
 from setuptools import setup
 
-with open('requirements.txt') as f:
+with open("requirements.txt") as f:
     required = f.read().splitlines()
 
 setup(
@@ -13,5 +13,5 @@ setup(
             "ask=ask.ask:main",
         ],
     },
-    install_requires=required
+    install_requires=required,
 )

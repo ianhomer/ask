@@ -1,6 +1,7 @@
 import os
-from unittest.mock import patch
 from io import StringIO
+from unittest.mock import patch
+
 from ..ask import main
 from .e2e_utils import mock_parse_args
 
