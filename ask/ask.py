@@ -16,22 +16,6 @@ from .services.gemini import Gemini
 from .services.ollama import Ollama
 from .transcribe import register_transcribed_text, stop_transcribe
 
-transcribe_thread: Optional[threading.Thread] = None
-
-
-def signal_handler(sig: int, frame: Optional[object]) -> None:
-    quit(RichRenderer())
-    sys.exit(0)
-
-
-def quit(renderer: AbstractRenderer) -> None:
-    renderer.print_line("Bye ...")
-    if transcribe_thread:
-        stop_transcribe()
-
-
-signal.signal(signal.SIGINT, signal_handler)
-
 
 def run(
     inputter: AbstractInputter = PromptInputter(),
@@ -40,7 +24,19 @@ def run(
     parse_args=default_parse_args,
     config_file_name="~/.config/ask/ask.ini",
 ) -> AbstractRenderer:
-    global transcribe_thread
+
+    transcribe_thread: Optional[threading.Thread] = None
+
+    def quit(renderer: AbstractRenderer) -> None:
+        renderer.print_line("Bye ...")
+        if transcribe_thread:
+            stop_transcribe()
+
+    def signal_handler(sig: int, frame: Optional[object]) -> None:
+        quit(RichRenderer())
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, signal_handler)
 
     config = load_config(parse_args, config_file_name)
 
