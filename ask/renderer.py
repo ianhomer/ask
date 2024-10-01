@@ -20,7 +20,6 @@ class AbstractRenderer:
 
     def print_line(self, message):
         self.print(message)
-        self.print("\n")
 
     def print_processing(self):
         self.print_line("...")

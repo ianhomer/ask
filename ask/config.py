@@ -98,6 +98,9 @@ class Config:
 
     @property
     def pipeline(self) -> str:
+        if "ASK_PIPELINE" in os.environ:
+            return os.environ["ASK_PIPELINE"]
+
         pipeline = self.config.get("DEFAULT", "pipeline", fallback=None)
 
         if pipeline:
