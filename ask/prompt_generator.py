@@ -7,7 +7,7 @@ from pypdf import PdfReader
 ASK_PROMPT_DIRECTORY_NAME = "ASK_PROMPT_DIRECTORY"
 
 
-def get_prompt(inputs: List[str], template: Optional[str]) -> Tuple[str, bool]:
+def generate_prompt(inputs: List[str], template: Optional[str]) -> Tuple[str, bool]:
     parts = []
     file_input = False
     for word in inputs:

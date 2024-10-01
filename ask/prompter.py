@@ -16,7 +16,7 @@ style = Style.from_dict({"marker": "#FFA500 bold"})
 prompt_fragments: AnyFormattedText = [("class:marker", "(-_-) ")]
 
 
-class AbstractInputter:
+class AbstractPrompter:
     @abstractmethod
     def get_input(self) -> str:
         pass
@@ -37,7 +37,7 @@ class AbstractInputter:
         return True
 
 
-class PromptInputter(AbstractInputter):
+class UserPrompter(AbstractPrompter):
     def __init__(self) -> None:
         self.prompt_session: PromptSession = PromptSession(
             prompt_fragments, style=style, vi_mode=True

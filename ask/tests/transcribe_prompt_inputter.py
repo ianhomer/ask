@@ -3,11 +3,11 @@ from collections import deque
 
 from prompt_toolkit import PromptSession
 
-from ..input import AbstractInputter, InputInterrupt
+from ..prompter import AbstractPrompter, InputInterrupt
 from ..transcribe import is_running
 
 
-class TranscribePromptInputter(AbstractInputter):
+class TranscribePromptInputter(AbstractPrompter):
     def __init__(
         self,
         transcribe_filename,

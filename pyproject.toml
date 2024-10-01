@@ -1,0 +1,7 @@
+[tool.pytest-watcher]
+now = false
+delay = 0.2
+runner = "pytest"
+runner_args = []
+patterns = ["*.py"]
+ignore_patterns = [".null-ls*"]

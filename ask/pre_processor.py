@@ -5,7 +5,7 @@ from .renderer import AbstractRenderer
 from .save import save
 
 
-class InputHandlerResponse:
+class PromptPreProcessorResponse:
     def __init__(self, ignore=False, process=True, quit=False) -> None:
         self._ignore = ignore
         self._process = process
@@ -27,24 +27,24 @@ class InputHandlerResponse:
         return f"ignore:{self._ignore}, process:{self._process}, quit:{self._quit}"
 
 
-class InputHandler:
+class PromptPreProcessor:
     def __init__(self, renderer: AbstractRenderer) -> None:
         self.renderer = renderer
 
     def handle(
         self, input: str, previous_response_text: Optional[str]
-    ) -> InputHandlerResponse:
+    ) -> PromptPreProcessorResponse:
         input_lower = input.lower()
         if input_lower == "save":
             save(previous_response_text)
-            return InputHandlerResponse(process=False)
+            return PromptPreProcessorResponse(process=False)
 
         if previous_response_text and (
             ("copy code" in input_lower and len(input) < 17)
             or ("copy" in input_lower and len(input) < 7)
         ):
             copy_code(self.renderer, previous_response_text)
-            return InputHandlerResponse(process=False)
+            return PromptPreProcessorResponse(process=False)
 
         # The handling for <quit> is currently only used within end to end
         # tests and may be removed.
@@ -53,9 +53,9 @@ class InputHandler:
             or input_lower.endswith("<quit>")
             or input_lower.startswith("<quit>")
         ):
-            return InputHandlerResponse(quit=True)
+            return PromptPreProcessorResponse(quit=True)
 
         if input_lower.endswith("ignore"):
-            return InputHandlerResponse(process=False, ignore=True)
+            return PromptPreProcessorResponse(process=False, ignore=True)
 
-        return InputHandlerResponse()
+        return PromptPreProcessorResponse()

@@ -8,7 +8,7 @@ Run tests
 
     pytest
 
-Run tests with watch
+Run tests with pytest watcher
 
     ptw
 

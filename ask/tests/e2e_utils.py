@@ -1,11 +1,11 @@
 import argparse
 from collections import deque
 
-from ..input import AbstractInputter, InputInterrupt
+from ..prompter import AbstractPrompter, InputInterrupt
 from ..renderer import AbstractRenderer
 
 
-class MockInputter(AbstractInputter):
+class MockInputter(AbstractPrompter):
     def __init__(self, inputs=["mock input 1"]) -> None:
         self.queue = deque(inputs)
 

@@ -6,9 +6,9 @@ from typing import Optional
 from prompt_toolkit.patch_stdout import patch_stdout
 
 from .config import default_parse_args, load_config
-from .handler import InputHandler
-from .input import AbstractInputter, InputInterrupt, PromptInputter
-from .prompt import get_prompt
+from .pre_processor import PromptPreProcessor
+from .prompt_generator import generate_prompt
+from .prompter import AbstractPrompter, InputInterrupt, UserPrompter
 from .renderer import AbstractRenderer, RichRenderer
 from .services.anthropic import AnthropicService
 from .services.bot_service import BotService
@@ -18,7 +18,7 @@ from .transcribe import register_transcribed_text, stop_transcribe
 
 
 def run(
-    inputter: AbstractInputter = PromptInputter(),
+    inputter: AbstractPrompter = UserPrompter(),
     Service: Optional[type[BotService]] = None,
     Renderer: type[AbstractRenderer] = RichRenderer,
     parse_args=default_parse_args,
@@ -41,11 +41,11 @@ def run(
     config = load_config(parse_args, config_file_name)
 
     renderer = Renderer(pretty_markdown=config.markdown)
-    input_handler = InputHandler(renderer=renderer)
+    input_handler = PromptPreProcessor(renderer=renderer)
 
     file_input = False
 
-    prompt, file_input = get_prompt(config.inputs, config.template)
+    prompt, file_input = generate_prompt(config.inputs, config.template)
 
     if config.dry:
         renderer.print_line("Prompt : ")
