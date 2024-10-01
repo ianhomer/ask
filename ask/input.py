@@ -18,7 +18,7 @@ prompt_fragments: AnyFormattedText = [("class:marker", "(-_-) ")]
 
 class AbstractInputter:
     @abstractmethod
-    def get_input(self) -> str:
+    async def get_input(self) -> str:
         pass
 
     @abstractmethod
@@ -39,20 +39,19 @@ class AbstractInputter:
 
 class PromptInputter(AbstractInputter):
     def __init__(self) -> None:
-        self.prompt_session = PromptSession()
+        self.prompt_session: PromptSession = PromptSession(
+            prompt_fragments, style=style, vi_mode=True
+        )
 
     @property
     def current_buffer(self):
         return self.prompt_session.app.current_buffer
 
-    def get_input(self) -> str:
+    async def get_input(self) -> str:
         try:
             return (
-                self.prompt_session.prompt(
-                    prompt_fragments, style=style, vi_mode=True
-                ).strip()
-                + self.get_more_input_with_wait()
-            )
+                await self.prompt_session.prompt_async()
+            ).strip() + self.get_more_input_with_wait()
         except KeyboardInterrupt as e:
             raise InputInterrupt(e)
 

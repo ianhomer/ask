@@ -1,7 +1,10 @@
+import asyncio
 import signal
 import sys
 import threading
 from typing import Optional
+
+from prompt_toolkit.patch_stdout import patch_stdout
 
 from .config import default_parse_args, load_config
 from .handler import InputHandler
@@ -31,7 +34,7 @@ def quit(renderer: AbstractRenderer) -> None:
 signal.signal(signal.SIGINT, signal_handler)
 
 
-def run(
+async def run(
     inputter: AbstractInputter = PromptInputter(),
     Service: Optional[type[BotService]] = None,
     Renderer: type[AbstractRenderer] = RichRenderer,
@@ -70,39 +73,42 @@ def run(
         renderer.print_response(response_text)
         return response_text
 
-    response_text: Optional[str] = None
-
     if config.transcribe.enabled:
         transcribe_thread = register_transcribed_text(
             config.transcribe.filename,
             inputter,
             loop_sleep=config.transcribe.loop_sleep,
         )
-    if config.inputs or file_input:
-        response_text = process(
-            "answer or do what I just asked. If you have no answer, "
-            + "just say the word :'OK'",
-        )
 
-    while service.available:
-        try:
-            user_input = inputter.get_input()
-        except InputInterrupt:
-            quit(renderer)
-            break
-        if user_input and len(user_input) > 0:
-            input_handler_response = input_handler.handle(user_input, response_text)
-            if input_handler_response.quit:
-                quit(renderer)
-                break
-            if input_handler_response.process:
-                response_text = process(user_input)
+    async def ask_prompt():
+        response_text: Optional[str] = None
+
+        if config.inputs or file_input:
+            response_text = process(
+                "answer or do what I just asked. If you have no answer, "
+                + "just say the word :'OK'",
+            )
+        while service.available:
+            user_input = await inputter.get_input()
+            if user_input and len(user_input) > 0:
+                input_handler_response = input_handler.handle(user_input, response_text)
+                if input_handler_response.quit:
+                    quit(renderer)
+                    break
+                if input_handler_response.process:
+                    response_text = process(user_input)
+
+    try:
+        with patch_stdout():
+            await ask_prompt()
+    except InputInterrupt:
+        quit(renderer)
 
     return renderer
 
 
 def main() -> None:
-    run()
+    asyncio.run(run())
     return
 
 
