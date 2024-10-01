@@ -151,3 +151,15 @@ template with the base name. For example the following would use `my-prompt` in
 the `ASK_PROMPT_DIRECTORY` directory.
 
     ask --template my-prompt one two three
+
+## One shot question and answer
+
+Ask a one shot question and expect a single answer
+
+    ask --one explain relativity to me in 100 words
+
+You can enable this mode in the shell using the `ASK_PIPELINE` environment variable.
+
+    export ASK_PIPELINE=one-shot
+    ask can you describe Falmouth
+    ask pi to 100 decimal places
