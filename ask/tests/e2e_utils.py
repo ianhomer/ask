@@ -1,6 +1,7 @@
 import argparse
 from collections import deque
 
+from ..config import create_parser
 from ..prompter import AbstractPrompter, InputInterrupt
 from ..renderer import AbstractRenderer
 
@@ -18,6 +19,7 @@ class MockInputter(AbstractPrompter):
 
 def mock_parse_args():
     return argparse.Namespace(
+        debug=True,
         dry=False,
         inputs=[],
         line_target=0,
@@ -28,6 +30,10 @@ def mock_parse_args():
         transcribe_filename="/tmp/transcribe.txt",
         transcribe_loop_sleep=0.5,
     )
+
+
+def parse_args_for_tests():
+    return create_parser().parse_args(["--no-markdown", "--provider=mock"])
 
 
 class CapturingRenderer(AbstractRenderer):

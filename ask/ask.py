@@ -1,6 +1,3 @@
-import signal
-import sys
-import threading
 from typing import Optional
 
 from prompt_toolkit.patch_stdout import patch_stdout
@@ -9,12 +6,13 @@ from .config import default_parse_args, load_config
 from .pre_processor import PromptPreProcessor
 from .prompt_generator import generate_prompt
 from .prompter import AbstractPrompter, InputInterrupt, UserPrompter
+from .quitter import Quitter
 from .renderer import AbstractRenderer, RichRenderer
 from .services.anthropic import AnthropicService
 from .services.bot_service import BotService
 from .services.gemini import Gemini
 from .services.ollama import Ollama
-from .transcribe import register_transcribed_text, stop_transcribe
+from .transcribe import register_transcribed_text
 
 
 def run(
@@ -25,22 +23,10 @@ def run(
     config_file_name="~/.config/ask/ask.ini",
 ) -> AbstractRenderer:
 
-    transcribe_thread: Optional[threading.Thread] = None
-
-    def quit(renderer: AbstractRenderer) -> None:
-        renderer.print_line("Bye ...")
-        if transcribe_thread:
-            stop_transcribe()
-
-    def signal_handler(sig: int, frame: Optional[object]) -> None:
-        quit(RichRenderer())
-        sys.exit(0)
-
-    signal.signal(signal.SIGINT, signal_handler)
-
     config = load_config(parse_args, config_file_name)
 
     renderer = Renderer(pretty_markdown=config.markdown)
+    quitter = Quitter(renderer)
     prompt_pre_processor = PromptPreProcessor(renderer=renderer)
 
     file_input = False
@@ -65,10 +51,12 @@ def run(
     response_text: Optional[str] = None
 
     if config.transcribe.enabled:
-        transcribe_thread = register_transcribed_text(
-            config.transcribe.filename,
-            inputter,
-            loop_sleep=config.transcribe.loop_sleep,
+        quitter.register(
+            register_transcribed_text(
+                config.transcribe.filename,
+                inputter,
+                loop_sleep=config.transcribe.loop_sleep,
+            )
         )
     if config.inputs or file_input:
         response_text = service.send_message(
@@ -81,12 +69,12 @@ def run(
             with patch_stdout():
                 prompt = inputter.get_input()
         except InputInterrupt:
-            quit(renderer)
+            quitter.quit()
             break
         if prompt and len(prompt) > 0:
             input_handler_response = prompt_pre_processor.handle(prompt, response_text)
             if input_handler_response.quit:
-                quit(renderer)
+                quitter.quit()
                 break
             if input_handler_response.process:
                 try:

@@ -2,7 +2,9 @@ import os
 import re
 import threading
 import time
-from typing import List, Optional
+from typing import Callable, List, Optional
+
+from .config import is_debug
 
 running = False
 
@@ -29,7 +31,10 @@ remove_filters = [
 
 def stop_transcribe():
     global running
-    running = False
+    if running:
+        if is_debug():
+            print("... stopping transcribe thread")
+        running = False
 
 
 def is_running():
@@ -39,16 +44,17 @@ def is_running():
 
 def register_transcribed_text(
     transcribe_filename, inputter, loop_sleep: float = 2
-) -> Optional[threading.Thread]:
+) -> Callable[[], None]:
     global running
     if os.path.exists(transcribe_filename):
         transcribe_thread = threading.Thread(
             target=transcribe_worker,
             args=(transcribe_filename, inputter, loop_sleep),
         )
+        if is_debug():
+            print("... starting transcribe thread")
         transcribe_thread.start()
-        return transcribe_thread
-    return None
+    return stop_transcribe
 
 
 def transcribe_worker(transcribe_filename, inputter, loop_sleep):

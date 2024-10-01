@@ -14,6 +14,7 @@ def create_parse_args_with_transcribe_filename(transcribe_filename):
     def parse_args():
         return argparse.Namespace(
             dry=False,
+            debug=True,
             inputs=[],
             line_target=0,
             transcribe_loop_sleep=0.001,
@@ -27,9 +28,7 @@ def create_parse_args_with_transcribe_filename(transcribe_filename):
 
 
 class MockBotService(BotService):
-    def send_message(
-        self, prompt, previous_response_text: Optional[str] = None
-    ) -> Optional[str]:
+    def send_message(self, prompt, previous_response_text: Optional[str] = None) -> str:
         return "OK:" + prompt
 
     @property

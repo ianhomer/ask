@@ -4,11 +4,18 @@ import os
 
 empty_config = configparser.ConfigParser()
 
+DEBUG = False
 
-def default_parse_args() -> argparse.Namespace:
+
+def is_debug():
+    return DEBUG
+
+
+def create_parser():
     parser = argparse.ArgumentParser(description="Asker")
 
     parser.add_argument("inputs", help="Input content", nargs="*")
+    parser.add_argument("--debug", help="Debug logging", action="store_true")
     parser.add_argument("--template", help="Input template")
     parser.add_argument("--provider", help="Service provider", default="Gemini")
     parser.add_argument(
@@ -37,18 +44,24 @@ def default_parse_args() -> argparse.Namespace:
         help="Disable rendering of Markdown responses",
         action="store_true",
     )
+    return parser
 
-    return parser.parse_args()
+
+def default_parse_args() -> argparse.Namespace:
+    return create_parser().parse_args()
 
 
 def load_config(actual_parse_args, config_file_name):
+    global DEBUG
     config = configparser.ConfigParser()
     config_file_path = os.path.expanduser(config_file_name)
     config.read(config_file_path)
 
     args = actual_parse_args()
 
-    return Config(args, config)
+    merged_config = Config(args, config)
+    DEBUG = merged_config.debug_enabled
+    return merged_config
 
 
 class Config:
@@ -73,6 +86,10 @@ class Config:
     @property
     def dry(self) -> bool:
         return self.config.get("DEFAULT", "dry", fallback=self.args.dry)
+
+    @property
+    def debug_enabled(self) -> bool:
+        return self.config.get("DEFAULT", "debug", fallback=self.args.debug)
 
     @property
     def inputs(self) -> list[str]:
