@@ -22,10 +22,8 @@ def run(
     parse_args=default_parse_args,
     config_file_name="~/.config/ask/ask.ini",
 ) -> AbstractRenderer:
-    file_input = False
 
     config = load_config(parse_args, config_file_name)
-
     renderer = Renderer(pretty_markdown=config.markdown)
     quitter = Quitter(renderer)
 

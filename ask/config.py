@@ -6,6 +6,8 @@ empty_config = configparser.ConfigParser()
 
 DEBUG = False
 
+ASK_PIPELINE_VARIABLE_NAME = "ASK_PIPELINE"
+
 
 def is_debug():
     return DEBUG
@@ -98,8 +100,8 @@ class Config:
 
     @property
     def pipeline(self) -> str:
-        if "ASK_PIPELINE" in os.environ:
-            return os.environ["ASK_PIPELINE"]
+        if ASK_PIPELINE_VARIABLE_NAME in os.environ:
+            return os.environ[ASK_PIPELINE_VARIABLE_NAME]
 
         pipeline = self.config.get("DEFAULT", "pipeline", fallback=None)
 
