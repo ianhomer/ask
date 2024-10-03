@@ -1,17 +1,16 @@
 # An AI command line chat bot
 
-An AI chat bot you can run from the command line. It provides a proxy onto the
-underlying [Google Gemini APIs](https://ai.google.dev/#gemini-api). When you
-start the chat bot you provide a context, either an opening question, file
-inputs or a prompt template. From that point you can ask further questions
+An AI chat bot you can run from the command line.
+
+By default, it provides a proxy onto the underlying [Google Gemini
+APIs](https://ai.google.dev/#gemini-api), which is available on a free tier.
+When you start the chat bot you provide a context, either an opening question,
+file inputs or a prompt template. From that point you can ask further questions
 from that context.
 
 ![example usage](./docs/example-usage.png)
 
 https://github.com/user-attachments/assets/52ea95f9-583b-4388-b9ca-c5458643fb7b
-
-You can try this out at no cost if you are in a region that is eligible for the
-Gemini API free usage.
 
 If you set up an voice to text transcribe service then you can control the command line with voice. See below for details.
 
